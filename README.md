@@ -18,3 +18,6 @@ Limite honesto: o jogo roda no navegador, então o ranking é "na confiança". O
 ## Requisitos no repositório
 - Pages ligado (Settings → Pages → branch `main`, pasta `/`).
 - Issues e Actions ligados (já vêm assim por padrão).
+
+## Licença
+Todos os direitos reservados. Veja o arquivo `LICENSE`.
