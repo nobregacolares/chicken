@@ -1,23 +1,19 @@
 # 🐔 Cacarejo Aim Lab
 
-Treino de mira estilo CS com galinhas. Modos Normal, Strafe e Precisão.
+A CS-style aim trainer, but with chickens. Modes: Normal, Strafe and Precision.
 
-Jogue: `https://SEU-USUARIO.github.io/cacarejo-aim-lab/`
+Play: https://nobregacolares.github.io/chicken/
 
-## Ranking global (sem servidor)
-O placar fica em `data/scores.json`, dentro do próprio repositório.
+## Global ranking (no server)
+The scoreboard lives in `data/scores.json`, inside this repository.
 
-1. Ao fim da partida o jogador clica em **Enviar ao ranking global**: abre uma issue pré-preenchida no GitHub (precisa de conta).
-2. A Action `.github/workflows/score.yml` roda `.github/scripts/score.js`, confere se o resultado é possível, atualiza o JSON e fecha a issue.
-3. O jogo lê o JSON direto do repositório. Há 3 listas por modo: **Ovos**, **Precisão** e **Reação média**. Precisão e reação só contam com 15+ acertos na partida, para 1 acerto em 1 tiro não virar 100%.
+1. At the end of a match the player clicks **Submit to global ranking**, which opens a pre-filled GitHub issue (a GitHub account is needed).
+2. The `.github/workflows/score.yml` Action runs `.github/scripts/score.js`, checks the result is possible, updates the JSON and closes the issue.
+3. The game reads the JSON straight from the repository. There are 3 lists per mode: **Eggs**, **Accuracy** and **Average reaction**. Accuracy and reaction only count with 15+ hits in the match, so 1 hit out of 1 shot does not become 100%.
 
-O nome mostrado vem do nick digitado, e o `@usuário` do GitHub vem da própria issue (não dá para se passar por outra pessoa).
+The displayed name is the typed nick; the `@user` comes from the issue itself, so nobody can impersonate someone else.
 
-Limite honesto: o jogo roda no navegador, então o ranking é "na confiança". O bot só barra o que é impossível (acertos demais, ovos que não batem com acertos e headshots, reação abaixo de 150 ms).
+Honest limit: the game runs in the browser, so the ranking is trust-based. The bot only blocks what is impossible (too many hits, eggs that do not match hits and headshots, reaction under 150 ms).
 
-## Requisitos no repositório
-- Pages ligado (Settings → Pages → branch `main`, pasta `/`).
-- Issues e Actions ligados (já vêm assim por padrão).
-
-## Licença
-Todos os direitos reservados. Veja o arquivo `LICENSE`.
+## License
+All rights reserved. See `LICENSE`.

@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cacarejo Aim Lab · treino de mira pra CS (com galinhas)</title>
-<meta name="description" content="Treine flick, tracking e tiro único atirando em galinhas. Um aim trainer de CS que cacareja.">
+<title>Cacarejo Aim Lab · CS aim trainer (with chickens)</title>
+<meta name="description" content="Train flick, tracking and one-tap precision by shooting chickens. A CS aim trainer that clucks.">
 <style>
 :root{--bg:#12161a;--panel:#1b2127;--panel2:#232b32;--line:#2f3a43;--ink:#e9eef2;--mute:#8b9aa5;--gold:#f5c24b;--green:#8fe05a;--red:#ff5a4a;--xh:#8fe05a;--xs:12px}
 *{box-sizing:border-box}
@@ -34,7 +34,7 @@ main{padding:18px 0 40px}
 .wall{position:absolute;left:0;right:0;top:30%;bottom:20%;background:
  linear-gradient(90deg,transparent 98%,#0002 98%) 0 0/46px 100%,
  linear-gradient(transparent 94%,#0002 94%) 0 0/100% 23px,#d2ab6c;border-top:5px solid #a9834a}
-.wall:after{content:'SÍTIO OVO';position:absolute;left:50%;top:14%;transform:translateX(-50%);font:900 clamp(26px,7vw,74px)/1 system-ui,sans-serif;color:#b8914f;letter-spacing:6px;opacity:.55;white-space:nowrap}
+.wall:after{content:'EGG SITE';position:absolute;left:50%;top:14%;transform:translateX(-50%);font:900 clamp(26px,7vw,74px)/1 system-ui,sans-serif;color:#b8914f;letter-spacing:6px;opacity:.55;white-space:nowrap}
 .ground{position:absolute;left:0;right:0;bottom:0;height:20%;background:radial-gradient(#0000000d 1px,transparent 1.5px) 0 0/6px 6px,#e5c78f;border-top:4px solid #b89558}
 .crate{position:absolute;background:repeating-linear-gradient(45deg,#0000 0 9px,#0001 9px 11px),#b07b3e;border:4px solid #7a4f22;box-shadow:inset 0 0 0 4px #c6924e}
 .crate:before,.crate:after{content:'';position:absolute;inset:0;background:linear-gradient(45deg,transparent 47%,#7a4f22 47% 53%,transparent 53%)}
@@ -154,18 +154,18 @@ dialog ol{padding-left:20px}dialog li{margin:8px 0}
 </head>
 <body>
 <header><div class="wrap bar">
- <div class="brand">🐔 CACAREJO <b>AIM LAB</b> <small>de_galinheiro</small></div>
+ <div class="brand">🐔 CACAREJO <b>AIM LAB</b> <small>de_henhouse</small></div>
  <span class="sp"></span>
- <button class="ctl" id="soundBtn" aria-pressed="true">🔊 Som</button>
- <button class="ctl" id="helpBtn" aria-label="Como jogar">?</button>
+ <button class="ctl" id="soundBtn" aria-pressed="true">🔊 Sound</button>
+ <button class="ctl" id="helpBtn" aria-label="How to play">?</button>
 </div></header>
 
 <main class="wrap">
-<section class="arena" id="arena" aria-label="Arena de tiro">
+<section class="arena" id="arena" aria-label="Shooting arena">
  <div class="scenery"><div class="sun"></div><div class="wall"></div><div class="ground"></div>
   <div class="crate c1"></div><div class="crate c2"></div><div class="crate c3"></div><div class="crate c4"></div></div>
  <div id="field">
-  <button id="hen" class="hen" tabindex="-1" hidden aria-label="Galinha">
+  <button id="hen" class="hen" tabindex="-1" hidden aria-label="Chicken">
    <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false">
     <g data-zone="body" stroke="#2b2220" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
      <path d="M42 88 L38 104 M62 88 L64 104" fill="none" stroke="#e08a2e" stroke-width="6"/>
@@ -190,100 +190,100 @@ dialog ol{padding-left:20px}dialog li{margin:8px 0}
  <div class="xh on" id="xh"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="d"></i></div>
 
  <div class="hud" aria-live="off">
-  <div class="chip t" id="chipT"><small>TEMPO</small><b id="hTime">01:00</b></div>
-  <div class="chip"><small>OVOS</small><b id="hScore">0</b></div>
-  <div class="chip"><small>PRECISÃO</small><b id="hAcc">--</b></div>
+  <div class="chip t" id="chipT"><small>TIME</small><b id="hTime">01:00</b></div>
+  <div class="chip"><small>EGGS</small><b id="hScore">0</b></div>
+  <div class="chip"><small>ACCURACY</small><b id="hAcc">--</b></div>
   <div class="chip"><small>HEADSHOTS</small><b id="hHs">0</b></div>
-  <div class="chip"><small>SEQUÊNCIA</small><b id="hStreak">0</b></div>
+  <div class="chip"><small>STREAK</small><b id="hStreak">0</b></div>
  </div>
  <div class="kf" id="kf"></div>
 
  <div class="ov" id="intro">
   <div class="card">
    <div class="title">CACAREJO!</div>
-   <p class="sub">Aim lab de galinha. Treine o flick pro CS sem sair do galinheiro: <b>headshot vale muito mais</b>, ovo dourado e zero pena.</p>
+   <p class="sub">Chicken aim lab. Train your CS flicks without leaving the henhouse: <b>headshots are worth way more</b>, golden eggs, zero mercy.</p>
    <div class="modes" id="modes"></div>
    <p class="sub" id="modeDesc" style="font-size:14px;min-height:40px"></p>
-   <div class="namerow"><label for="name">Seu nick</label><input id="name" maxlength="18" placeholder="ex: s1mpleBR" autocomplete="nickname" enterkeyhint="go"></div>
-   <button class="btn" id="play">▶ Jogar 60s</button>
+   <div class="namerow"><label for="name">Your nick</label><input id="name" maxlength="18" placeholder="e.g. s1mpleBR" autocomplete="nickname" enterkeyhint="go"></div>
+   <button class="btn" id="play">▶ Play 60s</button>
   </div>
  </div>
 
- <div class="ov" id="countOv" hidden><div class="card" style="background:transparent;border:0;box-shadow:none"><div class="sub" style="font-weight:800;letter-spacing:2px">ROUND COMEÇANDO…</div><div class="big" id="countNum">3</div><div class="sub" id="countTip"></div></div></div>
+ <div class="ov" id="countOv" hidden><div class="card" style="background:transparent;border:0;box-shadow:none"><div class="sub" style="font-weight:800;letter-spacing:2px">ROUND STARTING…</div><div class="big" id="countNum">3</div><div class="sub" id="countTip"></div></div></div>
 
  <div class="ov" id="result" hidden>
   <div class="card">
-   <div id="newrec" class="newrec" hidden>NOVO RECORDE PESSOAL!</div>
+   <div id="newrec" class="newrec" hidden>NEW PERSONAL BEST!</div>
    <div class="grade" id="rGrade"></div>
-   <div class="score"><span id="rScore">0</span> OVOS</div>
+   <div class="score"><span id="rScore">0</span> EGGS</div>
    <div class="sub" id="rTray" style="margin:4px 0"></div>
    <div class="rstats">
-    <div><small>PRECISÃO</small><b id="rAcc"></b></div>
+    <div><small>ACCURACY</small><b id="rAcc"></b></div>
     <div><small>HEADSHOTS</small><b id="rHs"></b></div>
-    <div><small>FUGIRAM</small><b id="rEsc"></b></div>
+    <div><small>ESCAPED</small><b id="rEsc"></b></div>
     <div><small id="rRtL"></small><b id="rRt"></b></div>
    </div>
    <div class="rstats r3">
-    <div><small>REAÇÃO MÉDIA</small><b id="rAvg"></b></div>
-    <div><small>MAIS RÁPIDA</small><b id="rFast" style="color:var(--green)"></b></div>
-    <div><small>MAIS LENTA</small><b id="rSlow" style="color:#ffb4ab"></b></div>
+    <div><small>AVG REACTION</small><b id="rAvg"></b></div>
+    <div><small>FASTEST</small><b id="rFast" style="color:var(--green)"></b></div>
+    <div><small>SLOWEST</small><b id="rSlow" style="color:#ffb4ab"></b></div>
    </div>
    <p class="note" id="rNote"></p>
    <p class="quip" id="rQuip"></p>
-   <div class="row"><button class="btn" id="again">▶ De novo</button><button class="btn ghost" id="submit">🌐 Enviar ao ranking global</button><button class="btn ghost" id="menu">Trocar modo</button></div>
+   <div class="row"><button class="btn" id="again">▶ Play again</button><button class="btn ghost" id="submit">🌐 Submit to global ranking</button><button class="btn ghost" id="menu">Change mode</button></div>
    <p class="note" id="subNote"></p>
   </div>
  </div>
 </section>
-<div class="console"><span id="status">Pronto. Aquece o pulso.</span><span id="tip"></span></div>
+<div class="console"><span id="status">Ready. Warm up that wrist.</span><span id="tip"></span></div>
 
 <div class="grid">
  <section class="panel" id="ranking">
-  <h2>🏆 Ranking <select id="rankMode" aria-label="Ranking por modo"></select></h2>
+  <h2>🏆 Ranking <select id="rankMode" aria-label="Ranking by mode"></select></h2>
   <div class="tabs" id="rankCat">
-   <button class="tab" data-c="ovos" aria-pressed="true">🥚 Ovos</button>
-   <button class="tab" data-c="acc" aria-pressed="false">🎯 Precisão</button>
-   <button class="tab" data-c="rt" aria-pressed="false">⚡ Reação</button>
+   <button class="tab" data-c="ovos" aria-pressed="true">🥚 Eggs</button>
+   <button class="tab" data-c="acc" aria-pressed="false">🎯 Accuracy</button>
+   <button class="tab" data-c="rt" aria-pressed="false">⚡ Reaction</button>
   </div>
   <div class="tabs small" id="rankSrc">
    <button class="tab" data-s="global" aria-pressed="true">🌐 Global</button>
-   <button class="tab" data-s="local" aria-pressed="false">💻 Neste navegador</button>
+   <button class="tab" data-s="local" aria-pressed="false">💻 This browser</button>
   </div>
-  <table><thead><tr><th>#</th><th>JOGADOR</th><th id="thVal">OVOS</th><th>ACERTOS</th></tr></thead><tbody id="rows"></tbody></table>
-  <p class="empty" id="rankEmpty">Ninguém por aqui ainda. O primeiro lugar tá de graça.</p>
+  <table><thead><tr><th>#</th><th>PLAYER</th><th id="thVal">EGGS</th><th>HITS</th></tr></thead><tbody id="rows"></tbody></table>
+  <p class="empty" id="rankEmpty">Nobody here yet. First place is up for grabs.</p>
   <p class="empty" style="font-size:12px" id="rankHint"></p>
  </section>
  <div style="display:flex;flex-direction:column;gap:16px">
   <section class="panel cfg">
-   <h2>⌖ Mira</h2>
-   <div><label>Cor</label><div class="sw" id="sw"></div></div>
-   <div><label for="xsize">Tamanho <span id="xsv" class="mono"></span></label><input type="range" id="xsize" min="4" max="24" value="10"></div>
-   <div><label for="xgap">Abertura <span id="xgv" class="mono"></span></label><input type="range" id="xgap" min="0" max="16" value="5"></div>
+   <h2>⌖ Crosshair</h2>
+   <div><label>Color</label><div class="sw" id="sw"></div></div>
+   <div><label for="xsize">Size <span id="xsv" class="mono"></span></label><input type="range" id="xsize" min="4" max="24" value="10"></div>
+   <div><label for="xgap">Gap <span id="xgv" class="mono"></span></label><input type="range" id="xgap" min="0" max="16" value="5"></div>
    <div class="prev"><div class="xh" id="xhPrev"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="d"></i></div></div>
   </section>
   <section class="panel">
-   <h2>🎯 Dicas de CS</h2>
+   <h2>🎯 CS tips</h2>
    <ul class="tips">
-    <li><b>Crosshair placement:</b> mantenha a mira na altura da cabeça, não no chão.</li>
-    <li><b>Flick:</b> mova o braço inteiro, o pulso só ajusta no final.</li>
-    <li><b>Precisão:</b> pare o mouse <i>antes</i> de clicar. Atirar em movimento erra.</li>
+    <li><b>Crosshair placement:</b> keep your aim at head height, not on the floor.</li>
+    <li><b>Flick:</b> move your whole arm, the wrist only fine-tunes at the end.</li>
+    <li><b>Precision:</b> stop the mouse <i>before</i> you click. Shooting while moving misses.</li>
    </ul>
   </section>
  </div>
 </div>
 </main>
-<footer>Cacarejo Aim Lab · nenhuma galinha foi ferida (o ego dela, sim).</footer>
+<footer>Cacarejo Aim Lab · no chickens were harmed (their egos were).</footer>
 
 <dialog id="help">
- <h2>Como jogar</h2>
+ <h2>How to play</h2>
  <ol>
-  <li>Escolha o modo, digite seu nick e clique em <b>Jogar</b>.</li>
-  <li>Clique ou toque na galinha. <b>Normal e Strafe:</b> corpo = 1 ovo, cabeça = 3 ovos dourados.</li>
-  <li><b>Precisão:</b> matou = 1, matou em um tiro só = 5, headshot = 2, headshot em um tiro só = 7. Se ela fugir, zero. Errar antes de acertar estraga o bônus.</li>
-  <li>Cada clique que não acerta conta como tiro perdido e derruba sua precisão.</li>
-  <li>Se a galinha fugir, a sequência zera. São 60 segundos e ela só acelera.</li>
+  <li>Pick a mode, type your nick and press <b>Play</b>.</li>
+  <li>Click or tap the chicken. <b>Normal and Strafe:</b> body = 1 egg, head = 3 golden eggs.</li>
+  <li><b>Precision:</b> kill = 1, one-shot kill = 5, headshot = 2, one-shot headshot = 7. If she escapes, zero. Missing before you hit ruins the bonus.</li>
+  <li>Every click that misses counts as a wasted shot and lowers your accuracy.</li>
+  <li>If the chicken escapes, your streak resets. You get 60 seconds and she only speeds up.</li>
  </ol>
- <button class="btn" id="helpOk" style="font-size:15px;padding:9px 20px">Bora</button>
+ <button class="btn" id="helpOk" style="font-size:15px;padding:9px 20px">Let's go</button>
 </dialog>
 
 <script>
@@ -297,17 +297,17 @@ const store={
 
 const DURATION=60000;
 const MODES={
- normal:{name:'Normal',tag:'clássico',desc:'A galinha pisca num lugar e some logo. Corpo vale 1 ovo, headshot vale 3.',size:[112,78],dwell:[1500,620],move:false,mult:.9,head:3},
- strafe:{name:'Strafe',tag:'tracking',desc:'Ela corre de lado e muda de direção do nada, igual inimigo que sabe dar counter-strafe. Headshot vale 3.',size:[104,72],dwell:[2800,1500],move:true,speed:[150,420],mult:.8,head:3},
- precisao:{name:'Precisão',tag:'tiro único',desc:'Galinha pequena, e cada tiro importa. Matou: 1 ponto. Em um tiro só: 5. Headshot: 2. Headshot em um tiro: 7. Fugiu: zero.',size:[92,60],dwell:[2000,1000],move:false,mult:.4,precision:true}
+ normal:{name:'Normal',tag:'classic',desc:'The chicken pops up in one spot and vanishes fast. Body = 1 egg, headshot = 3.',size:[112,78],dwell:[1500,620],move:false,mult:.9,head:3},
+ strafe:{name:'Strafe',tag:'tracking',desc:'She runs sideways and changes direction out of nowhere, like an enemy who knows how to counter-strafe. Headshot = 3.',size:[104,72],dwell:[2800,1500],move:true,speed:[150,420],mult:.8,head:3},
+ precisao:{name:'Precision',tag:'one-tap',desc:'Small chicken, every shot counts. Kill: 1 point. One shot only: 5. Headshot: 2. One-shot headshot: 7. Escaped: zero.',size:[92,60],dwell:[2000,1000],move:false,mult:.4,precision:true}
 };
-const TIERS=['Prata Pinto I','Prata Elite Penosa','Ouro Poedeira','Mestre Galináceo','Águia Cocoricó','Supremo Frangote','Global Elite Galinácea'];
-const HEN_NAMES=['Dona Cocota','Frangolino','Cocó Chanel','Galo Sem Noção','Penélope Pena','Gertrudes AWP','Galinácio','Tia Poedeira','Sargento Pipoca','Chico Frango','Rainha do Terreiro','Pintinho Pro'];
-const MISS_TAUNTS=['Errou!','Lag?','Ez.','Tá de olho fechado?','Mira de padaria','Cadê o skill?','Quase! (não)'];
-const ESC_TAUNTS=['Tchau!','Haha!','Muito lento!','Nem vi você','Cocó-ri-có!'];
-const HIT_CRIES=['CÓÓÓ!','AI, MEU OVO!','SOCÓRRO!','PÓ-CÓ!','FUI MORTA!','ME DEIXA!'];
-const TIPS=['No CS, mire na altura da cabeça antes de dobrar a esquina.','Respire. Mira tremida é mira que erra.','Sensibilidade menor costuma dar mais precisão no modo Precisão.','Aquecer 10 minutos antes do competitivo muda o jogo.','Clique só quando a mira parar. Spray e reza é outro modo.'];
-const STREAKS={3:'TRIO DE COXAS!',5:'ACE! GRANJA DIZIMADA',10:'ESQUADRÃO DE FRANGO',20:'GLOBAL ELITE GALINÁCEA!'};
+const TIERS=['Silver Chick I','Silver Elite Plucky','Gold Nova Layer','Master Guardian Hen','Legendary Eagle Cluck','Supreme Rooster First Class','The Global Elite Chicken'];
+const HEN_NAMES=['Miss Cluckers','Little Fryer','Coco Chanel','Clueless Rooster','Penelope Plume','Gertrude AWP','Henrietta','Auntie Layer','Sergeant Popcorn','Chuck Wing','Queen of the Coop','Pro Chick'];
+const MISS_TAUNTS=['Missed!','Lag?','Ez.','Eyes closed?','Bakery aim','Where is the skill?','So close! (not)'];
+const ESC_TAUNTS=['Bye!','Haha!','Too slow!','Did not even see you','Cock-a-doodle-doo!'];
+const HIT_CRIES=['BAWK!','MY EGG!','HELP!','BA-GAWK!','I\'M HIT!','LEAVE ME ALONE!'];
+const TIPS=['In CS, aim at head height before you turn the corner.','Breathe. Shaky aim is missing aim.','Lower sensitivity usually gives more precision in Precision mode.','Warming up 10 minutes before ranked changes the game.','Click only when the crosshair stops. Spray and pray is another mode.'];
+const STREAKS={3:'TRIPLE DRUMSTICK!',5:'ACE! FARM WIPED OUT',10:'SQUAD OF FRIED CHICKEN',20:'THE GLOBAL ELITE CHICKEN!'};
 
 /* ---------- elements ---------- */
 const arena=$('arena'),field=$('field'),hen=$('hen'),xh=$('xh');
@@ -327,7 +327,7 @@ const sfx={
  beep(f){tone(f,f,.13,'square',.09)},
  end(){tone(520,520,.12,'square',.1);tone(390,390,.12,'square',.1,.14);tone(260,260,.3,'square',.1,.28)}
 };
-function soundUI(){$('soundBtn').textContent=muted?'🔇 Mudo':'🔊 Som';$('soundBtn').setAttribute('aria-pressed',String(!muted))}
+function soundUI(){$('soundBtn').textContent=muted?'🔇 Muted':'🔊 Sound';$('soundBtn').setAttribute('aria-pressed',String(!muted))}
 $('soundBtn').onclick=()=>{muted=!muted;store.set('muted',muted);soundUI();if(!muted){A();sfx.cluck()}};
 soundUI();
 
@@ -339,7 +339,7 @@ function applyX(){
  $('xsv').textContent=xs;$('xgv').textContent=xg;$('xsize').value=xs;$('xgap').value=xg;
  for(const b of $('sw').children)b.setAttribute('aria-pressed',String(b.dataset.c===xc));
 }
-for(const c of COLORS){const b=document.createElement('button');b.style.background=c;b.dataset.c=c;b.setAttribute('aria-label','Cor '+c);b.onclick=()=>{xc=c;store.set('xcolor',c);applyX()};$('sw').append(b)}
+for(const c of COLORS){const b=document.createElement('button');b.style.background=c;b.dataset.c=c;b.setAttribute('aria-label','Color '+c);b.onclick=()=>{xc=c;store.set('xcolor',c);applyX()};$('sw').append(b)}
 $('xsize').oninput=e=>{xs=+e.target.value;store.set('xsize',xs);applyX()};
 $('xgap').oninput=e=>{xg=+e.target.value;store.set('xgap',xg);applyX()};
 document.querySelectorAll('#xhPrev i,#xh i').forEach(()=>{});
@@ -352,7 +352,7 @@ xh.classList.remove('on');
 
 /* ---------- state ---------- */
 let lastResult=null,mode='idle',startT=0,last=0,spawnAt=0,expireAt=0,respawnAt=0,visible=false;
-let hx=0,hy=0,hw=0,hh=0,vx=0,flip=false,lastSec=-1,player='Você',henShots=0;
+let hx=0,hy=0,hw=0,hh=0,vx=0,flip=false,lastSec=-1,player='You',henShots=0;
 let st=null;
 const prog=now=>clamp((now-startT)/DURATION,0,1);
 const fresh=()=>({perfect:0,score:0,shots:0,hits:0,heads:0,esc:0,streak:0,best:0,rts:[]});
@@ -406,7 +406,7 @@ function place(){hen.style.left=hx+'px';hen.style.top=hy+'px'}
 
 function escaped(now){
  visible=false;hen.hidden=true;st.esc++;
- if(st.streak>=3)kill('<em>'+esc(pick(HEN_NAMES))+'</em> fugiu e quebrou sua sequência','esc');
+ if(st.streak>=3)kill('<em>'+esc(pick(HEN_NAMES))+'</em> escaped and broke your streak','esc');
  st.streak=0;hud();
  bubble(pick(ESC_TAUNTS),hx+hw*.5,hy-8);
  respawnAt=now+rnd(120,380);
@@ -443,7 +443,7 @@ function onShot(e){
 function hit(zone,now,px,py){
  const head=zone==='head',m=MODES[modeId],first=henShots===1;
  let pts,label;
- if(m.precision){pts=head?(first?7:2):(first?5:1);label=(head?'HEADSHOT':'')+(first?(head?' ÚNICO':'TIRO ÚNICO'):(head?'':'')) ;if(first)st.perfect++}
+ if(m.precision){pts=head?(first?7:2):(first?5:1);label=(head?'HEADSHOT':'')+(first?(head?' ONE-TAP':'ONE-TAP'):'') ;if(first)st.perfect++}
  else{pts=head?m.head:1;label=head?'HEADSHOT':''}
  st.hits++;st.score+=pts;if(head)st.heads++;st.streak++;st.best=Math.max(st.best,st.streak);st.rts.push(now-spawnAt);
  sfx.cluck();if(head){sfx.head();shake()}
@@ -451,7 +451,7 @@ function hit(zone,now,px,py){
  bubble(pick(HIT_CRIES),hx+hw*(flip?0:.55),hy-6);
  eggFx(hx+hw*(flip?.7:.25),hy+hh*.6,hw,head);
  koFx();
- kill('<span>'+esc(player)+'</span> 🔫 <em>'+esc(pick(HEN_NAMES))+'</em>'+(head?' ⌖ HEADSHOT':'')+(m.precision&&first?' ⚡ 1 TIRO':'')+' <em>+'+pts+'</em>',head||pts>=5?'hsk':'');
+ kill('<span>'+esc(player)+'</span> 🔫 <em>'+esc(pick(HEN_NAMES))+'</em>'+(head?' ⌖ HEADSHOT':'')+(m.precision&&first?' ⚡ 1 SHOT':'')+' <em>+'+pts+'</em>',head||pts>=5?'hsk':'');
  if(STREAKS[st.streak])banner(STREAKS[st.streak]);
  visible=false;hen.hidden=true;respawnAt=now+rnd(80,200);
 }
@@ -481,13 +481,13 @@ function setMode(id){
  $('modeDesc').textContent=MODES[id].desc;$('rankMode').value=id;ranking();
 }
 function startRound(){
- const nm=$('name').value.trim().replace(/\s+/g,' ');player=nm||'Você';store.set('name',nm);
+ const nm=$('name').value.trim().replace(/\s+/g,' ');player=nm||'You';store.set('name',nm);
  A();mode='count';st=fresh();hud();setTime(DURATION);lastSec=-1;setTime(DURATION);
  $('kf').replaceChildren();$('intro').hidden=true;$('result').hidden=true;$('countOv').hidden=false;
  arena.classList.add('count');arena.classList.remove('playing');
  $('countTip').textContent=pick(TIPS);$('tip').innerHTML='<b>Dica:</b> '+esc(pick(TIPS));
  $('status').textContent=MODES[modeId].name+' · '+player;
- const seq=['3','2','1','JÁ!'];let i=0;
+ const seq=['3','2','1','GO!'];let i=0;
  const step=()=>{
   if(mode!=='count')return;
   $('countNum').textContent=seq[i];sfx.beep(i===3?880:520);
@@ -506,12 +506,12 @@ function grade(){
  const v=st.score*MODES[modeId].mult,steps=[0,14,28,42,56,70,84];let g=0;for(let i=0;i<steps.length;i++)if(v>=steps[i])g=i;return TIERS[g];
 }
 function quip(acc){
- let q=acc<25?'Sua mira tá mais torta que pé de galinha.':acc<50?'Você atirou no vento, e o vento nem quis.':acc<70?'Dá pra jogar. No modo casual. Com amigos.':acc<85?'O vizinho pediu pra você parar de assustar o galinheiro.':'Mira de laser. A galinha pediu VAR.';
- if(st.hits>5&&st.heads/st.hits>.5)q+=' E ainda é headshot machine!';
- if(st.score===0)q='Zero ovos. A galinha saiu de fininho com a dignidade intacta.';
+ let q=acc<25?'Your aim is more crooked than a chicken\'s foot.':acc<50?'You shot at the wind, and the wind did not even want it.':acc<70?'Playable. In casual mode. With friends.':acc<85?'The neighbor asked you to stop scaring the henhouse.':'Laser aim. The chicken asked for a VAR review.';
+ if(st.hits>5&&st.heads/st.hits>.5)q+=' And a headshot machine to boot!';
+ if(st.score===0)q='Zero eggs. The chicken strolled away with her dignity intact.';
  return q;
 }
-/* Tira da conta as reações fora da curva (Tukey: além de 1,5x a faixa interquartil), só com 8+ acertos. */
+/* Drop outlier reactions (Tukey: beyond 1.5x the interquartile range), only with 8+ hits. */
 function reactionStats(arr){
  if(!arr.length)return null;
  const a=[...arr].sort((x,y)=>x-y),q=p=>{const i=(a.length-1)*p,l=Math.floor(i);return a[l]+(a[Math.min(l+1,a.length-1)]-a[l])*(i-l)};
@@ -525,24 +525,24 @@ function finish(){
  const acc=st.shots?Math.round(st.hits/st.shots*1000)/10:0,rs=reactionStats(st.rts),rt=rs?rs.avg:0;
  const trays=Math.floor(st.score/30),rest=st.score%30;
  $('rGrade').textContent=grade();$('rScore').textContent=st.score;
- $('rTray').textContent=trays+(trays===1?' bandeja cheia':' bandejas cheias')+' + '+rest+(rest===1?' ovo avulso':' ovos avulsos');
- $('rAcc').textContent=acc+'%';$('rHs').textContent=st.heads+' / '+st.hits;if(MODES[modeId].precision){$('rRtL').textContent='TIROS ÚNICOS';$('rRt').textContent=st.perfect+' / '+st.hits}else{$('rRtL').textContent='MELHOR SEQUÊNCIA';$('rRt').textContent=st.best}
+ $('rTray').textContent=trays+(trays===1?' full tray':' full trays')+' + '+rest+(rest===1?' loose egg':' loose eggs');
+ $('rAcc').textContent=acc+'%';$('rHs').textContent=st.heads+' / '+st.hits;if(MODES[modeId].precision){$('rRtL').textContent='ONE-TAPS';$('rRt').textContent=st.perfect+' / '+st.hits}else{$('rRtL').textContent='BEST STREAK';$('rRt').textContent=st.best}
  const ms=v=>v+' ms';
  $('rAvg').textContent=rs?ms(rs.avg):'--';$('rFast').textContent=rs?ms(rs.fast):'--';$('rSlow').textContent=rs?ms(rs.slow):'--';
- $('rNote').textContent=!rs?'':rs.dropped?rs.dropped+(rs.dropped===1?' reação atípica foi descartada':' reações atípicas foram descartadas')+' (mão fora de posição, distração). Média sobre '+(rs.total-rs.dropped)+' acertos.':'Média sobre '+rs.total+' acertos.';$('rEsc').textContent=st.esc;
+ $('rNote').textContent=!rs?'':rs.dropped?rs.dropped+(rs.dropped===1?' outlier reaction was discarded':' outlier reactions were discarded')+' (hand out of position, distraction). Average over '+(rs.total-rs.dropped)+' hits.':'Average over '+rs.total+' hits.';$('rEsc').textContent=st.esc;
  $('rQuip').textContent=quip(acc);
  lastResult={v:1,nick:player,mode:modeId,ovos:st.score,shots:st.shots,hits:st.hits,heads:st.heads,esc:st.esc,acc,rt,perfect:st.perfect,best:st.best};
  const rec=save(lastResult);
  $('newrec').hidden=!rec;prepSubmit();
- $('result').hidden=false;$('status').textContent='Fim de round · '+MODES[modeId].name;
+ $('result').hidden=false;$('status').textContent='Round over · '+MODES[modeId].name;
  $('rankMode').value=modeId;ranking();
 }
 $('play').onclick=startRound;$('again').onclick=startRound;$('menu').onclick=showIntro;
 $('name').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();startRound()}});
 $('helpBtn').onclick=()=>$('help').showModal();$('helpOk').onclick=()=>$('help').close();
 
-/* ---------- ranking: local + global (arquivo data/scores.json do repositório) ---------- */
-const MIN_HITS=15; /* precisão e reação só contam com 15+ acertos, senão 1 acerto em 1 tiro = 100% */
+/* ---------- ranking: local + global (data/scores.json file in the repository) ---------- */
+const MIN_HITS=15; /* accuracy and reaction only count with 15+ hits, otherwise 1 hit in 1 shot = 100% */
 function mergeScore(list,id,name,login,r){
  let e=list.find(x=>x.id===id);if(!e){e={id,name,ovos:null,acc:null,rt:null};list.push(e)}
  e.name=name;if(login)e.login=login;let rec=false;
@@ -558,9 +558,9 @@ function save(r){
  const rec=mergeScore(list,r.nick.toLowerCase(),r.nick,'',r);store.set(key,list);return rec;
 }
 const CATS={
- ovos:{th:'OVOS',fmt:v=>String(v),cmp:(a,b)=>b.ovos.v-a.ovos.v,hint:'Maior pontuação numa partida.'},
- acc:{th:'PRECISÃO',fmt:v=>v.toFixed(1)+'%',cmp:(a,b)=>b.acc.v-a.acc.v||b.acc.h-a.acc.h,hint:'Acertos ÷ cliques. Só conta com '+MIN_HITS+'+ acertos na partida.'},
- rt:{th:'REAÇÃO',fmt:v=>Math.round(v)+' ms',cmp:(a,b)=>a.rt.v-b.rt.v,hint:'Média sem as reações fora da curva. Só conta com '+MIN_HITS+'+ acertos na partida.'}
+ ovos:{th:'EGGS',fmt:v=>String(v),cmp:(a,b)=>b.ovos.v-a.ovos.v,hint:'Highest score in one match.'},
+ acc:{th:'ACCURACY',fmt:v=>v.toFixed(1)+'%',cmp:(a,b)=>b.acc.v-a.acc.v||b.acc.h-a.acc.h,hint:'Hits ÷ clicks. Only counts with '+MIN_HITS+'+ hits in the match.'},
+ rt:{th:'REACTION',fmt:v=>Math.round(v)+' ms',cmp:(a,b)=>a.rt.v-b.rt.v,hint:'Average without outlier reactions. Only counts with '+MIN_HITS+'+ hits in the match.'}
 };
 let rankCat='ovos',rankSrc='global',rv=0,gCache=null,gAt=0;
 const qs=new URLSearchParams(location.search);
@@ -583,12 +583,12 @@ async function loadGlobal(){
 }
 async function ranking(){
  const ver=++rv,m=$('rankMode').value,c=CATS[rankCat];
- $('thVal').textContent=c.th;$('rankHint').textContent=c.hint+(rankSrc==='local'?' Ranking salvo só neste navegador.':' Atualiza ~1 min após o envio.');
+ $('thVal').textContent=c.th;$('rankHint').textContent=c.hint+(rankSrc==='local'?' Saved only in this browser.':' Updates ~1 min after submission.');
  for(const b of $('rankCat').children)b.setAttribute('aria-pressed',String(b.dataset.c===rankCat));
  for(const b of $('rankSrc').children)b.setAttribute('aria-pressed',String(b.dataset.s===rankSrc));
  let data;
  try{data=rankSrc==='local'?store.get('rank2.'+m,[]):((await loadGlobal()).modes||{})[m]||[]}
- catch{if(ver!==rv)return;$('rows').replaceChildren();$('rankEmpty').hidden=false;$('rankEmpty').textContent='Ranking global indisponível agora. Abra o jogo pelo link do GitHub Pages.';return}
+ catch{if(ver!==rv)return;$('rows').replaceChildren();$('rankEmpty').hidden=false;$('rankEmpty').textContent='Global ranking unavailable right now. Open the game from the GitHub Pages link.';return}
  if(ver!==rv)return;
  const rows=data.filter(e=>e[rankCat]).sort(c.cmp).slice(0,10),tb=$('rows');tb.replaceChildren();
  rows.forEach((e,i)=>{
@@ -597,22 +597,22 @@ async function ranking(){
   cells.forEach((v,j)=>{const td=document.createElement('td');td.textContent=v;if(j===1&&e.login&&e.login.toLowerCase()!==e.name.toLowerCase()){const sm=document.createElement('small');sm.textContent=' @'+e.login;td.append(sm)}tr.append(td)});
   tb.append(tr);
  });
- $('rankEmpty').hidden=rows.length>0;$('rankEmpty').textContent=rankSrc==='local'?'Você ainda não jogou neste modo aqui.':'Ninguém por aqui ainda. O primeiro lugar tá de graça.';
+ $('rankEmpty').hidden=rows.length>0;$('rankEmpty').textContent=rankSrc==='local'?'You have not played this mode here yet.':'Nobody here yet. First place is up for grabs.';
 }
 $('rankMode').onchange=ranking;
 for(const b of $('rankCat').children)b.onclick=()=>{rankCat=b.dataset.c;ranking()};
 for(const b of $('rankSrc').children)b.onclick=()=>{rankSrc=b.dataset.s;ranking()};
 
-/* envio: abre uma issue pré-preenchida; o bot do repositório confere e grava em data/scores.json */
+/* submit: opens a pre-filled issue; the repository bot checks it and writes data/scores.json */
 function prepSubmit(){
  const ok=!!REPO&&lastResult&&lastResult.hits>0&&lastResult.ovos>0;
  $('submit').hidden=!REPO;$('submit').disabled=!ok;
- $('subNote').textContent=!REPO?'':ok?'Abre uma issue no GitHub (precisa de conta). O bot confere e atualiza o ranking em ~1 min.':'Acerte ao menos uma galinha para poder enviar.';
+ $('subNote').textContent=!REPO?'':ok?'Opens a GitHub issue (needs an account). A bot checks it and updates the ranking in ~1 min.':'Hit at least one chicken to be able to submit.';
 }
 $('submit').onclick=()=>{
  if(!REPO||!lastResult)return;
- const body='Resultado do Cacarejo Aim Lab. Só clique em "Submit new issue", não edite.\n\n```json\n'+JSON.stringify(lastResult)+'\n```\n';
- const title='[score] '+lastResult.nick+' · '+MODES[lastResult.mode].name+' · '+lastResult.ovos+' ovos';
+ const body='Cacarejo Aim Lab result. Just click "Submit new issue", do not edit.\n\n```json\n'+JSON.stringify(lastResult)+'\n```\n';
+ const title='[score] '+lastResult.nick+' · '+MODES[lastResult.mode].name+' · '+lastResult.ovos+' eggs';
  const url='https://github.com/'+REPO.owner+'/'+REPO.repo+'/issues/new?title='+encodeURIComponent(title)+'&body='+encodeURIComponent(body);
  window.open(url,'_blank','noopener');
 };
