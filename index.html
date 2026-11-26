@@ -485,7 +485,7 @@ function startRound(){
  A();mode='count';st=fresh();hud();setTime(DURATION);lastSec=-1;setTime(DURATION);
  $('kf').replaceChildren();$('intro').hidden=true;$('result').hidden=true;$('countOv').hidden=false;
  arena.classList.add('count');arena.classList.remove('playing');
- $('countTip').textContent=pick(TIPS);$('tip').innerHTML='<b>Dica:</b> '+esc(pick(TIPS));
+ $('countTip').textContent=pick(TIPS);$('tip').innerHTML='<b>Tip:</b> '+esc(pick(TIPS));
  $('status').textContent=MODES[modeId].name+' · '+player;
  const seq=['3','2','1','GO!'];let i=0;
  const step=()=>{
@@ -618,7 +618,7 @@ $('submit').onclick=()=>{
 };
 
 buildModes();setMode(modeId);showIntro();
-$('tip').innerHTML='<b>Dica:</b> '+esc(pick(TIPS));
+$('tip').innerHTML='<b>Tip:</b> '+esc(pick(TIPS));
 </script>
 </body>
 </html>
