@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-26T21:00:29.023Z",
+ "updated": "2026-11-26T23:05:48.474Z",
  "modes": {
   "normal": [
    {
@@ -13,7 +13,18 @@
     "t": "2026-11-26T21:00:29.023Z"
    }
   ],
-  "strafe": [],
+  "strafe": [
+   {
+    "name": "Nobregacolares",
+    "login": "nobregacolares",
+    "ovos": 62,
+    "acc": 48.8,
+    "rt": 927,
+    "hits": 42,
+    "heads": 10,
+    "t": "2026-11-26T23:05:48.474Z"
+   }
+  ],
   "precisao": []
  }
 }
