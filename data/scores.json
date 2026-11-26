@@ -1,26 +1,16 @@
 {
- "updated": "2026-11-26T20:45:17.692Z",
+ "updated": "2026-11-26T21:00:29.023Z",
  "modes": {
   "normal": [
    {
     "name": "nobregacolares",
     "login": "nobregacolares",
-    "ovos": 127,
-    "acc": null,
-    "rt": 824,
-    "hits": 43,
-    "heads": null,
-    "t": "2026-11-26T20:45:17.692Z"
-   },
-   {
-    "name": "nobregacolares",
-    "login": "nobregacolares",
-    "ovos": null,
-    "acc": 69,
-    "rt": null,
-    "hits": 40,
-    "heads": null,
-    "t": "2026-11-26T20:45:17.692Z"
+    "ovos": 131,
+    "acc": 67.2,
+    "rt": 797,
+    "hits": 45,
+    "heads": 43,
+    "t": "2026-11-26T21:00:29.023Z"
    }
   ],
   "strafe": [],
