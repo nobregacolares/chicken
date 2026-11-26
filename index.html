@@ -213,7 +213,7 @@ dialog ol{padding-left:20px}dialog li{margin:8px 0}
 
  <div class="ov" id="result" hidden>
   <div class="card">
-   <div id="newrec" class="newrec" hidden>NEW PERSONAL BEST!</div>
+   <div id="newrec" class="newrec" hidden>NEW PERSONAL BEST (eggs)!</div>
    <div class="grade" id="rGrade"></div>
    <div class="score"><span id="rScore">0</span> EGGS</div>
    <div class="sub" id="rTray" style="margin:4px 0"></div>
@@ -543,24 +543,18 @@ $('helpBtn').onclick=()=>$('help').showModal();$('helpOk').onclick=()=>$('help')
 
 /* ---------- ranking: local + global (data/scores.json file in the repository) ---------- */
 const MIN_HITS=15; /* accuracy and reaction only count with 15+ hits, otherwise 1 hit in 1 shot = 100% */
-function mergeScore(list,id,name,login,r){
- let e=list.find(x=>x.id===id);if(!e){e={id,name,ovos:null,acc:null,rt:null};list.push(e)}
- e.name=name;if(login)e.login=login;let rec=false;
- if(r.ovos>0&&(!e.ovos||r.ovos>e.ovos.v)){e.ovos={v:r.ovos,h:r.hits};rec=true}
- if(r.hits>=MIN_HITS){
-  if(!e.acc||r.acc>e.acc.v||(r.acc===e.acc.v&&r.hits>e.acc.h)){e.acc={v:r.acc,h:r.hits};rec=true}
-  if(r.rt&&(!e.rt||r.rt<e.rt.v)){e.rt={v:r.rt,h:r.hits};rec=true}
- }
- return rec;
-}
+/* every match is stored as ONE row; nothing is ever overwritten */
+function makeRow(r,login){return{name:r.nick,login:login||undefined,ovos:r.ovos,acc:r.acc,rt:r.hits>=MIN_HITS&&r.rt>0?r.rt:null,hits:r.hits,heads:r.heads,t:Date.now()}}
 function save(r){
- const key='rank2.'+r.mode,list=store.get(key,[]);
- const rec=mergeScore(list,r.nick.toLowerCase(),r.nick,'',r);store.set(key,list);return rec;
+ const key='rank3.'+r.mode,list=store.get(key,[]),me=r.nick.toLowerCase();
+ const prevBest=Math.max(0,...list.filter(x=>x.name.toLowerCase()===me).map(x=>x.ovos));
+ list.push(makeRow(r));store.set(key,list.slice(-1000));
+ return r.ovos>0&&r.ovos>prevBest;
 }
 const CATS={
- ovos:{th:'EGGS',fmt:v=>String(v),cmp:(a,b)=>b.ovos.v-a.ovos.v,hint:'Highest score in one match.'},
- acc:{th:'ACCURACY',fmt:v=>v.toFixed(1)+'%',cmp:(a,b)=>b.acc.v-a.acc.v||b.acc.h-a.acc.h,hint:'Hits ÷ clicks. Only counts with '+MIN_HITS+'+ hits in the match.'},
- rt:{th:'REACTION',fmt:v=>Math.round(v)+' ms',cmp:(a,b)=>a.rt.v-b.rt.v,hint:'Average without outlier reactions. Only counts with '+MIN_HITS+'+ hits in the match.'}
+ ovos:{th:'EGGS',ok:r=>r.ovos>0,val:r=>String(r.ovos),cmp:(a,b)=>b.ovos-a.ovos||b.acc-a.acc,hint:'Every match is one row. Sorted by eggs.'},
+ acc:{th:'ACCURACY',ok:r=>r.hits>=MIN_HITS&&r.acc!=null,val:r=>r.acc.toFixed(1)+'%',cmp:(a,b)=>b.acc-a.acc||b.hits-a.hits,hint:'Every match is one row. Hits ÷ clicks, only matches with '+MIN_HITS+'+ hits.'},
+ rt:{th:'REACTION',ok:r=>r.hits>=MIN_HITS&&r.rt>0,val:r=>Math.round(r.rt)+' ms',cmp:(a,b)=>a.rt-b.rt,hint:'Every match is one row. Average without outlier reactions, only matches with '+MIN_HITS+'+ hits.'}
 };
 let rankCat='ovos',rankSrc='global',rv=0,gCache=null,gAt=0;
 const qs=new URLSearchParams(location.search);
@@ -587,13 +581,13 @@ async function ranking(){
  for(const b of $('rankCat').children)b.setAttribute('aria-pressed',String(b.dataset.c===rankCat));
  for(const b of $('rankSrc').children)b.setAttribute('aria-pressed',String(b.dataset.s===rankSrc));
  let data;
- try{data=rankSrc==='local'?store.get('rank2.'+m,[]):((await loadGlobal()).modes||{})[m]||[]}
+ try{data=rankSrc==='local'?store.get('rank3.'+m,[]):((await loadGlobal()).modes||{})[m]||[]}
  catch{if(ver!==rv)return;$('rows').replaceChildren();$('rankEmpty').hidden=false;$('rankEmpty').textContent='Global ranking unavailable right now. Open the game from the GitHub Pages link.';return}
  if(ver!==rv)return;
- const rows=data.filter(e=>e[rankCat]).sort(c.cmp).slice(0,10),tb=$('rows');tb.replaceChildren();
+ const rows=data.filter(c.ok).sort(c.cmp).slice(0,10),tb=$('rows');tb.replaceChildren();
  rows.forEach((e,i)=>{
   const tr=document.createElement('tr');if(player&&e.name.toLowerCase()===player.toLowerCase())tr.className='me';
-  const cells=[String(i+1).padStart(2,'0'),e.name,c.fmt(e[rankCat].v),e[rankCat].h];
+  const cells=[String(i+1).padStart(2,'0'),e.name,c.val(e),e.hits];
   cells.forEach((v,j)=>{const td=document.createElement('td');td.textContent=v;if(j===1&&e.login&&e.login.toLowerCase()!==e.name.toLowerCase()){const sm=document.createElement('small');sm.textContent=' @'+e.login;td.append(sm)}tr.append(td)});
   tb.append(tr);
  });

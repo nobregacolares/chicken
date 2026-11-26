@@ -1,5 +1,5 @@
 'use strict';
-// Validates the result sent in an issue and updates data/scores.json.
+// Validates the result sent in an issue and appends it to data/scores.json.
 // Trust-based ranking: the game runs in the browser, so we can only block what is impossible.
 const fs = require('fs');
 const FILE = 'data/scores.json';
@@ -27,19 +27,7 @@ function validate(r) {
   return null;
 }
 
-function merge(list, id, name, login, r) {
-  let e = list.find(x => x.id === id);
-  if (!e) { e = { id, name, login, ovos: null, acc: null, rt: null }; list.push(e); }
-  e.name = name; e.login = login;
-  const msgs = [];
-  if (r.ovos > 0 && (!e.ovos || r.ovos > e.ovos.v)) { e.ovos = { v: r.ovos, h: r.hits }; msgs.push('eggs'); }
-  if (r.hits >= MIN_HITS) {
-    if (!e.acc || r.acc > e.acc.v || (r.acc === e.acc.v && r.hits > e.acc.h)) { e.acc = { v: r.acc, h: r.hits }; msgs.push('accuracy'); }
-    if (!e.rt || r.rt < e.rt.v) { e.rt = { v: r.rt, h: r.hits }; msgs.push('reaction'); }
-  }
-  return msgs;
-}
-
+// Every match is appended as ONE row. Nothing is overwritten.
 function record(body, author, data) {
   const m = /```json\s*([\s\S]*?)```/.exec(body || '');
   if (!m) return { ok: false, msg: 'Could not find the result JSON in the issue body.' };
@@ -48,17 +36,47 @@ function record(body, author, data) {
   if (bad) return { ok: false, msg: 'Submission rejected: ' + bad + '.' };
   const name = sanitizeName(r.nick) || author;
   data.modes = data.modes || {}; for (const k of MODES) data.modes[k] = data.modes[k] || [];
-  const recs = merge(data.modes[r.mode], author.toLowerCase(), name, author, r);
-  data.updated = new Date().toISOString();
-  const resumo = `${name} (@${author}) · ${r.mode} · ${r.ovos} eggs · ${r.acc}% accuracy` + (r.rt ? ` · ${r.rt} ms` : '');
-  const extra = r.hits < MIN_HITS ? `\n\nAccuracy and reaction only count with ${MIN_HITS}+ hits; this match had ${r.hits}.` : '';
-  return { ok: true, msg: (recs.length ? '✅ Recorded! New personal best in: ' + recs.join(', ') + '.' : '✅ Received, but it did not beat your current records.') + '\n\n' + resumo + extra + '\n\nThe ranking updates in ~1 minute.' };
+  const qualifies = r.hits >= MIN_HITS;
+  const row = { name, login: author, ovos: r.ovos, acc: r.acc, rt: qualifies ? r.rt : null, hits: r.hits, heads: r.heads, t: new Date().toISOString() };
+  const list = data.modes[r.mode];
+  list.push(row);
+  data.updated = row.t;
+  const pos = (ok, cmp) => list.filter(ok).sort(cmp).indexOf(row) + 1;
+  const places = [`eggs #${pos(x => x.ovos > 0, (a, b) => b.ovos - a.ovos || b.acc - a.acc)}`];
+  if (qualifies) {
+    places.push(`accuracy #${pos(x => x.hits >= MIN_HITS && x.acc != null, (a, b) => b.acc - a.acc || b.hits - a.hits)}`);
+    if (row.rt) places.push(`reaction #${pos(x => x.hits >= MIN_HITS && x.rt > 0, (a, b) => a.rt - b.rt)}`);
+  }
+  const resumo = `${name} (@${author}) · ${r.mode} · ${r.ovos} eggs · ${r.acc}% accuracy` + (row.rt ? ` · ${row.rt} ms` : '');
+  const extra = qualifies ? '' : `\n\nAccuracy and reaction lists only count matches with ${MIN_HITS}+ hits; this match had ${r.hits}.`;
+  return { ok: true, msg: '✅ Recorded as a new row! Position: ' + places.join(', ') + '.\n\n' + resumo + extra + '\n\nPrevious rows are kept. The ranking updates in ~1 minute.' };
 }
 
-module.exports = { record, validate, sanitizeName };
+// Converts old "best per player" entries ({id, ovos:{v,h}, acc:{v,h}, rt:{v,h}}) into plain rows.
+// Values that share the same hit count are assumed to come from the same match.
+function normalize(data) {
+  data.modes = data.modes || {};
+  for (const mode of MODES) {
+    const out = [];
+    for (const e of data.modes[mode] || []) {
+      if (typeof e.ovos !== 'object' && typeof e.acc !== 'object' && typeof e.rt !== 'object') { out.push(e); continue; }
+      const byHits = new Map();
+      for (const f of ['ovos', 'acc', 'rt']) {
+        const x = e[f]; if (!x || typeof x !== 'object') continue;
+        if (!byHits.has(x.h)) byHits.set(x.h, { name: e.name, login: e.login, ovos: null, acc: null, rt: null, hits: x.h, heads: null, t: data.updated || null });
+        byHits.get(x.h)[f] = x.v;
+      }
+      out.push(...byHits.values());
+    }
+    data.modes[mode] = out;
+  }
+  return data;
+}
+
+module.exports = { normalize, record, validate, sanitizeName };
 
 if (require.main === module) {
-  const data = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+  const data = normalize(JSON.parse(fs.readFileSync(FILE, 'utf8')));
   const res = record(process.env.ISSUE_BODY || '', process.env.ISSUE_AUTHOR || 'anon', data);
   fs.writeFileSync('/tmp/score_msg.txt', res.msg);
   console.log(res.msg);

@@ -3,21 +3,24 @@
  "modes": {
   "normal": [
    {
-    "id": "nobregacolares",
     "name": "nobregacolares",
     "login": "nobregacolares",
-    "ovos": {
-     "v": 127,
-     "h": 43
-    },
-    "acc": {
-     "v": 69,
-     "h": 40
-    },
-    "rt": {
-     "v": 824,
-     "h": 43
-    }
+    "ovos": 127,
+    "acc": null,
+    "rt": 824,
+    "hits": 43,
+    "heads": null,
+    "t": "2026-11-26T20:45:17.692Z"
+   },
+   {
+    "name": "nobregacolares",
+    "login": "nobregacolares",
+    "ovos": null,
+    "acc": 69,
+    "rt": null,
+    "hits": 40,
+    "heads": null,
+    "t": "2026-11-26T20:45:17.692Z"
    }
   ],
   "strafe": [],

@@ -9,7 +9,7 @@ The scoreboard lives in `data/scores.json`, inside this repository.
 
 1. At the end of a match the player clicks **Submit to global ranking**, which opens a pre-filled GitHub issue (a GitHub account is needed).
 2. The `.github/workflows/score.yml` Action runs `.github/scripts/score.js`, checks the result is possible, updates the JSON and closes the issue.
-3. The game reads the JSON straight from the repository. There are 3 lists per mode: **Eggs**, **Accuracy** and **Average reaction**. Accuracy and reaction only count with 15+ hits in the match, so 1 hit out of 1 shot does not become 100%.
+3. Every match is stored as **one new row**; nothing is overwritten, so all previous results are kept. The game reads the JSON straight from the repository and shows 3 lists per mode: **Eggs**, **Accuracy** and **Average reaction**, each sorted from all rows. Accuracy and reaction only count matches with 15+ hits, so 1 hit out of 1 shot does not become 100%.
 
 The displayed name is the typed nick; the `@user` comes from the issue itself, so nobody can impersonate someone else.
 
