@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-26T20:41:35.223Z",
+ "updated": "2026-11-26T20:45:17.692Z",
  "modes": {
   "normal": [
    {
@@ -7,16 +7,16 @@
     "name": "nobregacolares",
     "login": "nobregacolares",
     "ovos": {
-     "v": 112,
-     "h": 40
+     "v": 127,
+     "h": 43
     },
     "acc": {
      "v": 69,
      "h": 40
     },
     "rt": {
-     "v": 854,
-     "h": 40
+     "v": 824,
+     "h": 43
     }
    }
   ],
