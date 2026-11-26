@@ -1,1 +1,26 @@
-{"updated":null,"modes":{"normal":[],"strafe":[],"precisao":[]}}
+{
+ "updated": "2026-11-26T20:41:35.223Z",
+ "modes": {
+  "normal": [
+   {
+    "id": "nobregacolares",
+    "name": "nobregacolares",
+    "login": "nobregacolares",
+    "ovos": {
+     "v": 112,
+     "h": 40
+    },
+    "acc": {
+     "v": 69,
+     "h": 40
+    },
+    "rt": {
+     "v": 854,
+     "h": 40
+    }
+   }
+  ],
+  "strafe": [],
+  "precisao": []
+ }
+}
