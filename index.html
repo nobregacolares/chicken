@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cacarejo Aim Lab · treino de mira pra CS (com galinhas)</title>
+<meta name="description" content="Treine flick, tracking e tiro único atirando em galinhas. Um aim trainer de CS que cacareja.">
+<style>
+:root{--bg:#12161a;--panel:#1b2127;--panel2:#232b32;--line:#2f3a43;--ink:#e9eef2;--mute:#8b9aa5;--gold:#f5c24b;--green:#8fe05a;--red:#ff5a4a;--xh:#8fe05a;--xs:12px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.45}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.wrap{width:min(1080px,calc(100% - 28px));margin:auto}
+.mono{font-family:ui-monospace,'SF Mono',Consolas,'Courier New',monospace}
+header{background:#0d1114;border-bottom:3px solid var(--gold)}
+.bar{display:flex;align-items:center;gap:14px;height:58px}
+.brand{font-weight:900;letter-spacing:.5px;font-size:20px;display:flex;gap:8px;align-items:center}
+.brand b{color:var(--gold)}
+.brand small{font:700 11px ui-monospace,Consolas,monospace;color:#0d1114;background:var(--gold);padding:2px 6px;border-radius:3px}
+.sp{flex:1}
+.ctl{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font-weight:700;font-size:14px}
+.ctl:hover{background:#2c363e}
+main{padding:18px 0 40px}
+
+/* ARENA */
+.arena{position:relative;border:3px solid #000;border-radius:10px;overflow:hidden;height:clamp(310px,54vw,520px);background:#8cc3e6;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 6px 0 #05080a}
+.arena.playing,.arena.count{cursor:none}
+.arena.shake{animation:shake .14s}
+@keyframes shake{25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}75%{transform:translate(2px,2px)}}
+.scenery{position:absolute;inset:0;pointer-events:none;background:linear-gradient(#7dbbe3 0,#bfe0f0 34%,#f4dcae 34.1%,#f4dcae 100%)}
+.wall{position:absolute;left:0;right:0;top:30%;bottom:20%;background:
+ linear-gradient(90deg,transparent 98%,#0002 98%) 0 0/46px 100%,
+ linear-gradient(transparent 94%,#0002 94%) 0 0/100% 23px,#d2ab6c;border-top:5px solid #a9834a}
+.wall:after{content:'SÍTIO OVO';position:absolute;left:50%;top:14%;transform:translateX(-50%);font:900 clamp(26px,7vw,74px)/1 system-ui,sans-serif;color:#b8914f;letter-spacing:6px;opacity:.55;white-space:nowrap}
+.ground{position:absolute;left:0;right:0;bottom:0;height:20%;background:radial-gradient(#0000000d 1px,transparent 1.5px) 0 0/6px 6px,#e5c78f;border-top:4px solid #b89558}
+.crate{position:absolute;background:repeating-linear-gradient(45deg,#0000 0 9px,#0001 9px 11px),#b07b3e;border:4px solid #7a4f22;box-shadow:inset 0 0 0 4px #c6924e}
+.crate:before,.crate:after{content:'';position:absolute;inset:0;background:linear-gradient(45deg,transparent 47%,#7a4f22 47% 53%,transparent 53%)}
+.crate:after{transform:scaleX(-1)}
+.c1{left:5%;bottom:14%;width:11%;aspect-ratio:1}.c2{left:15%;bottom:14%;width:8%;aspect-ratio:1;transform:translateY(-100%)}
+.c3{right:7%;bottom:12%;width:13%;aspect-ratio:1}.c4{right:30%;bottom:16%;width:7%;aspect-ratio:1}
+.sun{position:absolute;right:12%;top:9%;width:54px;height:54px;border-radius:50%;background:#fff2b3;box-shadow:0 0 0 8px #fff5c844}
+#field{position:absolute;inset:0}
+.hen{position:absolute;padding:0;border:0;background:none;pointer-events:none}
+.hen svg{display:block;width:100%;height:100%;overflow:visible}
+.hen.flip svg{transform:scaleX(-1)}
+.hen [data-zone]{pointer-events:all}
+.hen[hidden]{display:none}
+.hen:after{content:'';position:absolute;left:12%;bottom:-3%;width:64%;height:8%;border-radius:50%;background:#0003;z-index:-1}
+.hole{position:absolute;width:11px;height:11px;margin:-5px 0 0 -5px;border-radius:50%;background:radial-gradient(#000 35%,#0006 38%,transparent 70%);pointer-events:none;animation:fade 3.2s forwards}
+@keyframes fade{70%{opacity:1}100%{opacity:0}}
+.egg{position:absolute;pointer-events:none;border:2px solid #6d4b30;border-radius:50% 50% 48% 48%/62% 62% 40% 40%;background:radial-gradient(ellipse at 32% 27%,#fffef0 0 12%,#fff1cb 16% 49%,#edc690 78%)}
+.egg.gold{background:radial-gradient(ellipse at 32% 27%,#fffbd0 0 12%,#ffe27a 16% 49%,#e0a21e 78%);border-color:#7a5410;box-shadow:0 0 12px #ffd54f}
+.float{position:absolute;pointer-events:none;font:900 italic 18px/1 system-ui,sans-serif;color:#fff;text-shadow:-1px -1px #000,1px -1px #000,-1px 1px #000,1px 1px #000,0 2px #000;white-space:nowrap;animation:rise .85s ease-out forwards;z-index:6}
+.float.hs{color:var(--gold);font-size:22px}
+.float.bad{color:#ffb4ab}
+@keyframes rise{0%{transform:translate(-50%,0) scale(.6);opacity:0}15%{transform:translate(-50%,-6px) scale(1.15);opacity:1}100%{transform:translate(-50%,-44px) scale(1);opacity:0}}
+.bubble{position:absolute;z-index:6;pointer-events:none;background:#fffbe4;color:#3a2a20;border:2px solid #3a2a20;border-radius:10px;padding:3px 9px;font:900 italic 14px/1.1 system-ui,sans-serif;white-space:nowrap;animation:rise .95s ease-out forwards}
+.xh{position:absolute;left:0;top:0;width:0;height:0;z-index:9;pointer-events:none;display:none}
+.xh i{position:absolute;background:var(--xh);box-shadow:0 0 0 1px #000}
+.xh .t{width:2px;height:var(--xl,10px);left:-1px;top:calc(-1*var(--xs) - var(--xl,10px))}
+.xh .b{width:2px;height:var(--xl,10px);left:-1px;top:var(--xs)}
+.xh .l{height:2px;width:var(--xl,10px);top:-1px;left:calc(-1*var(--xs) - var(--xl,10px))}
+.xh .r{height:2px;width:var(--xl,10px);top:-1px;left:var(--xs)}
+.xh .d{width:2px;height:2px;left:-1px;top:-1px;box-shadow:0 0 0 1px #000}
+.arena.playing .xh.on,.arena.count .xh.on{display:block}
+
+/* HUD */
+.hud{position:absolute;left:0;right:0;top:0;display:flex;gap:8px;padding:10px;pointer-events:none;z-index:8;flex-wrap:wrap}
+.chip{background:#0b0f12cc;color:#fff;border:1px solid #fff3;border-radius:6px;padding:5px 10px;min-width:72px}
+.chip small{display:block;font:700 10px ui-monospace,Consolas,monospace;letter-spacing:1.2px;color:#9fb0bb}
+.chip b{font:800 20px/1.1 ui-monospace,Consolas,monospace}
+.chip.t b{color:var(--gold)}
+.chip.low b{color:var(--red)}
+.kf{position:absolute;right:10px;top:68px;width:min(320px,62%);display:flex;flex-direction:column;align-items:flex-end;gap:4px;z-index:8;pointer-events:none}
+.kf div{background:#0b0f12d9;border:1px solid #fff3;border-left:3px solid var(--green);color:#fff;font:700 12px ui-monospace,Consolas,monospace;padding:4px 8px;border-radius:3px;animation:kf 4.4s forwards;max-width:100%}
+.kf div.hsk{border-left-color:var(--gold)}.kf div.esc{border-left-color:var(--red)}
+.kf em{font-style:normal;color:var(--green)}.kf .hsk em{color:var(--gold)}
+@keyframes kf{0%{transform:translateX(30px);opacity:0}6%{transform:none;opacity:1}85%{opacity:1}100%{opacity:0}}
+.banner{position:absolute;left:50%;top:26%;transform:translate(-50%,-50%);z-index:9;pointer-events:none;text-align:center;font:900 clamp(22px,5vw,44px)/1.05 system-ui,sans-serif;font-style:italic;color:var(--gold);text-shadow:-2px -2px #000,2px -2px #000,-2px 2px #000,2px 2px #000,0 5px #000;animation:ban 1.6s forwards;white-space:nowrap}
+@keyframes ban{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}12%{transform:translate(-50%,-50%) scale(1.1);opacity:1}80%{opacity:1}100%{transform:translate(-50%,-70%) scale(1);opacity:0}}
+
+/* OVERLAYS */
+.ov{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#0b0f12b8;padding:12px;overflow:auto}
+.ov[hidden]{display:none}
+.card{background:var(--panel);border:2px solid var(--gold);border-radius:10px;padding:20px 22px;text-align:center;width:min(560px,100%);box-shadow:0 6px 0 #000}
+.title{font:900 clamp(38px,9vw,66px)/1 system-ui,sans-serif;margin:4px 0 2px;letter-spacing:-1px;color:var(--gold);text-shadow:0 4px #000}
+.sub{margin:0 0 14px;color:#c4d0d8}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.mode{background:var(--panel2);border:2px solid var(--line);border-radius:8px;padding:9px 6px;text-align:center}
+.mode b{display:block;font-size:16px}
+.mode span{display:block;font-size:12px;color:var(--mute);margin-top:2px}
+.mode[aria-pressed=true]{border-color:var(--gold);background:#2d2a1b}
+.mode[aria-pressed=true] b{color:var(--gold)}
+.namerow{display:flex;gap:8px;align-items:center;margin:10px 0;text-align:left}
+.namerow label{font-size:13px;color:var(--mute);white-space:nowrap}
+.namerow input{flex:1;min-width:0;background:#0f1418;border:2px solid var(--line);border-radius:6px;padding:9px 10px}
+.btn{background:var(--gold);color:#1a1405;border:0;border-bottom:4px solid #a97d12;border-radius:7px;padding:12px 26px;font-weight:900;font-size:18px;letter-spacing:.5px;text-transform:uppercase}
+.btn:hover{background:#ffd467}
+.btn:active{transform:translateY(2px);border-bottom-width:2px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);font-size:14px;padding:9px 16px;text-transform:none;font-weight:700}
+.btn.ghost:hover{background:var(--panel2)}
+.big{font:900 clamp(60px,16vw,120px)/1 system-ui,sans-serif;color:var(--gold);text-shadow:0 5px #000}
+.grade{font:900 clamp(20px,4.5vw,30px)/1.1 system-ui,sans-serif;color:var(--gold);margin:2px 0 4px}
+.score{font:900 40px/1 ui-monospace,Consolas,monospace}
+.quip{color:#ffd9a0;font-style:italic;margin:6px 0 12px}
+.rstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
+.rstats div{background:var(--panel2);border-radius:6px;padding:7px 4px}
+.rstats small{display:block;font:700 10px ui-monospace,Consolas,monospace;letter-spacing:1px;color:var(--mute)}
+.rstats.r3{grid-template-columns:repeat(3,1fr);margin-top:0}.note{font-size:12px;color:var(--mute);margin:4px 0 0}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.tab{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:7px 4px;font-weight:700;font-size:13px}
+.tab[aria-pressed=true]{border-color:var(--gold);color:var(--gold);background:#2d2a1b}
+.tabs.small .tab{font-size:12px;padding:4px}
+td small{color:var(--mute)}
+.rstats b{font:800 18px ui-monospace,Consolas,monospace}
+.row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.newrec{display:inline-block;background:var(--red);color:#fff;font:900 12px system-ui;padding:3px 8px;border-radius:4px;letter-spacing:1px;margin-bottom:6px}
+
+.console{display:flex;justify-content:space-between;gap:12px;padding:9px 4px 0;color:var(--mute);font-size:13px}
+.console b{color:var(--gold)}
+
+/* PANELS */
+.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-top:16px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.panel h2{margin:0 0 12px;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.panel select{background:#0f1418;border:1px solid var(--line);border-radius:5px;padding:4px 6px;font-size:13px;text-transform:none;letter-spacing:0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font:700 10px ui-monospace,Consolas,monospace;letter-spacing:1px;color:var(--mute);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+td{padding:7px 4px;border-bottom:1px dashed var(--line)}
+td:last-child,th:last-child,td:nth-child(3),th:nth-child(3){text-align:right}
+tr.me td{color:var(--gold)}
+.empty{color:var(--mute);margin:6px 0}
+.cfg{display:flex;flex-direction:column;gap:12px}
+.cfg label{font-size:13px;color:var(--mute);display:block;margin-bottom:5px}
+.sw{display:flex;gap:8px}
+.sw button{width:32px;height:32px;border-radius:50%;border:3px solid transparent;outline:1px solid #000}
+.sw button[aria-pressed=true]{border-color:#fff}
+.prev{height:70px;border-radius:8px;background:linear-gradient(#7dbbe3 50%,#d2ab6c 50%);position:relative;border:1px solid #000}
+.prev .xh{display:block;left:50%;top:50%}
+input[type=range]{width:100%;accent-color:var(--gold)}
+.tips li{margin:6px 0;font-size:14px;color:#c4d0d8}
+.tips{padding-left:18px;margin:0}
+footer{color:var(--mute);font-size:12px;text-align:center;padding:10px}
+dialog{background:var(--panel);color:var(--ink);border:2px solid var(--gold);border-radius:10px;width:min(430px,calc(100% - 24px));padding:20px}
+dialog::backdrop{background:#000a}
+dialog h2{margin:0 0 10px;color:var(--gold)}
+dialog ol{padding-left:20px}dialog li{margin:8px 0}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.rstats{grid-template-columns:repeat(2,1fr)}.rstats.r3{grid-template-columns:repeat(3,1fr)}.chip{min-width:58px;padding:4px 7px}.chip b{font-size:16px}.kf{top:60px}.brand small{display:none}}
+@media(prefers-reduced-motion:reduce){.arena.shake{animation:none}.banner,.float,.bubble{animation-duration:.4s}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+ <div class="brand">🐔 CACAREJO <b>AIM LAB</b> <small>de_galinheiro</small></div>
+ <span class="sp"></span>
+ <button class="ctl" id="soundBtn" aria-pressed="true">🔊 Som</button>
+ <button class="ctl" id="helpBtn" aria-label="Como jogar">?</button>
+</div></header>
+
+<main class="wrap">
+<section class="arena" id="arena" aria-label="Arena de tiro">
+ <div class="scenery"><div class="sun"></div><div class="wall"></div><div class="ground"></div>
+  <div class="crate c1"></div><div class="crate c2"></div><div class="crate c3"></div><div class="crate c4"></div></div>
+ <div id="field">
+  <button id="hen" class="hen" tabindex="-1" hidden aria-label="Galinha">
+   <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false">
+    <g data-zone="body" stroke="#2b2220" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+     <path d="M42 88 L38 104 M62 88 L64 104" fill="none" stroke="#e08a2e" stroke-width="6"/>
+     <path d="M36 100 h-8 M40 105 h-8 M64 104 h10 M60 108 h10" fill="none" stroke="#e08a2e" stroke-width="4"/>
+     <path d="M16 50 Q2 34 10 22 Q16 38 26 42 Q20 28 32 24 Q34 40 40 50Z" fill="#f2d49b"/>
+     <ellipse cx="52" cy="64" rx="34" ry="28" fill="#fff4dc"/>
+     <path d="M32 64 Q46 84 66 68 Q54 56 32 64Z" fill="#f0d6a6"/>
+    </g>
+    <g data-zone="head" stroke="#2b2220" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+     <path d="M68 56 Q74 42 80 34 L94 40 Q94 54 88 64Z" fill="#fff4dc"/>
+     <circle cx="84" cy="30" r="17" fill="#fff4dc"/>
+     <path d="M72 18 Q70 6 78 8 Q80 0 87 6 Q94 2 95 12 Q100 12 94 20 Q84 22 72 18Z" fill="#e0483a"/>
+     <path d="M98 26 L116 32 L99 38Z" fill="#ffc251"/>
+     <path d="M96 38 Q104 40 102 52 Q98 56 95 48Z" fill="#e95245"/>
+     <circle cx="89" cy="27" r="5" fill="#fff"/><circle cx="90" cy="27" r="2.4" fill="#222" stroke="none"/>
+     <path d="M82 20 L96 21" stroke-width="2.5" fill="none"/>
+     <circle cx="84" cy="30" r="22" fill="transparent" stroke="none"/>
+    </g>
+   </svg>
+  </button>
+ </div>
+ <div class="xh on" id="xh"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="d"></i></div>
+
+ <div class="hud" aria-live="off">
+  <div class="chip t" id="chipT"><small>TEMPO</small><b id="hTime">01:00</b></div>
+  <div class="chip"><small>OVOS</small><b id="hScore">0</b></div>
+  <div class="chip"><small>PRECISÃO</small><b id="hAcc">--</b></div>
+  <div class="chip"><small>HEADSHOTS</small><b id="hHs">0</b></div>
+  <div class="chip"><small>SEQUÊNCIA</small><b id="hStreak">0</b></div>
+ </div>
+ <div class="kf" id="kf"></div>
+
+ <div class="ov" id="intro">
+  <div class="card">
+   <div class="title">CACAREJO!</div>
+   <p class="sub">Aim lab de galinha. Treine o flick pro CS sem sair do galinheiro: <b>headshot vale muito mais</b>, ovo dourado e zero pena.</p>
+   <div class="modes" id="modes"></div>
+   <p class="sub" id="modeDesc" style="font-size:14px;min-height:40px"></p>
+   <div class="namerow"><label for="name">Seu nick</label><input id="name" maxlength="18" placeholder="ex: s1mpleBR" autocomplete="nickname" enterkeyhint="go"></div>
+   <button class="btn" id="play">▶ Jogar 60s</button>
+  </div>
+ </div>
+
+ <div class="ov" id="countOv" hidden><div class="card" style="background:transparent;border:0;box-shadow:none"><div class="sub" style="font-weight:800;letter-spacing:2px">ROUND COMEÇANDO…</div><div class="big" id="countNum">3</div><div class="sub" id="countTip"></div></div></div>
+
+ <div class="ov" id="result" hidden>
+  <div class="card">
+   <div id="newrec" class="newrec" hidden>NOVO RECORDE PESSOAL!</div>
+   <div class="grade" id="rGrade"></div>
+   <div class="score"><span id="rScore">0</span> OVOS</div>
+   <div class="sub" id="rTray" style="margin:4px 0"></div>
+   <div class="rstats">
+    <div><small>PRECISÃO</small><b id="rAcc"></b></div>
+    <div><small>HEADSHOTS</small><b id="rHs"></b></div>
+    <div><small>FUGIRAM</small><b id="rEsc"></b></div>
+    <div><small id="rRtL"></small><b id="rRt"></b></div>
+   </div>
+   <div class="rstats r3">
+    <div><small>REAÇÃO MÉDIA</small><b id="rAvg"></b></div>
+    <div><small>MAIS RÁPIDA</small><b id="rFast" style="color:var(--green)"></b></div>
+    <div><small>MAIS LENTA</small><b id="rSlow" style="color:#ffb4ab"></b></div>
+   </div>
+   <p class="note" id="rNote"></p>
+   <p class="quip" id="rQuip"></p>
+   <div class="row"><button class="btn" id="again">▶ De novo</button><button class="btn ghost" id="submit">🌐 Enviar ao ranking global</button><button class="btn ghost" id="menu">Trocar modo</button></div>
+   <p class="note" id="subNote"></p>
+  </div>
+ </div>
+</section>
+<div class="console"><span id="status">Pronto. Aquece o pulso.</span><span id="tip"></span></div>
+
+<div class="grid">
+ <section class="panel" id="ranking">
+  <h2>🏆 Ranking <select id="rankMode" aria-label="Ranking por modo"></select></h2>
+  <div class="tabs" id="rankCat">
+   <button class="tab" data-c="ovos" aria-pressed="true">🥚 Ovos</button>
+   <button class="tab" data-c="acc" aria-pressed="false">🎯 Precisão</button>
+   <button class="tab" data-c="rt" aria-pressed="false">⚡ Reação</button>
+  </div>
+  <div class="tabs small" id="rankSrc">
+   <button class="tab" data-s="global" aria-pressed="true">🌐 Global</button>
+   <button class="tab" data-s="local" aria-pressed="false">💻 Neste navegador</button>
+  </div>
+  <table><thead><tr><th>#</th><th>JOGADOR</th><th id="thVal">OVOS</th><th>ACERTOS</th></tr></thead><tbody id="rows"></tbody></table>
+  <p class="empty" id="rankEmpty">Ninguém por aqui ainda. O primeiro lugar tá de graça.</p>
+  <p class="empty" style="font-size:12px" id="rankHint"></p>
+ </section>
+ <div style="display:flex;flex-direction:column;gap:16px">
+  <section class="panel cfg">
+   <h2>⌖ Mira</h2>
+   <div><label>Cor</label><div class="sw" id="sw"></div></div>
+   <div><label for="xsize">Tamanho <span id="xsv" class="mono"></span></label><input type="range" id="xsize" min="4" max="24" value="10"></div>
+   <div><label for="xgap">Abertura <span id="xgv" class="mono"></span></label><input type="range" id="xgap" min="0" max="16" value="5"></div>
+   <div class="prev"><div class="xh" id="xhPrev"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="d"></i></div></div>
+  </section>
+  <section class="panel">
+   <h2>🎯 Dicas de CS</h2>
+   <ul class="tips">
+    <li><b>Crosshair placement:</b> mantenha a mira na altura da cabeça, não no chão.</li>
+    <li><b>Flick:</b> mova o braço inteiro, o pulso só ajusta no final.</li>
+    <li><b>Precisão:</b> pare o mouse <i>antes</i> de clicar. Atirar em movimento erra.</li>
+   </ul>
+  </section>
+ </div>
+</div>
+</main>
+<footer>Cacarejo Aim Lab · nenhuma galinha foi ferida (o ego dela, sim).</footer>
+
+<dialog id="help">
+ <h2>Como jogar</h2>
+ <ol>
+  <li>Escolha o modo, digite seu nick e clique em <b>Jogar</b>.</li>
+  <li>Clique ou toque na galinha. <b>Normal e Strafe:</b> corpo = 1 ovo, cabeça = 3 ovos dourados.</li>
+  <li><b>Precisão:</b> matou = 1, matou em um tiro só = 5, headshot = 2, headshot em um tiro só = 7. Se ela fugir, zero. Errar antes de acertar estraga o bônus.</li>
+  <li>Cada clique que não acerta conta como tiro perdido e derruba sua precisão.</li>
+  <li>Se a galinha fugir, a sequência zera. São 60 segundos e ela só acelera.</li>
+ </ol>
+ <button class="btn" id="helpOk" style="font-size:15px;padding:9px 20px">Bora</button>
+</dialog>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,rnd=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)];
+const store={
+ get(k,f){try{const v=localStorage.getItem('cacarejo.'+k);return v===null?f:JSON.parse(v)}catch{return f}},
+ set(k,v){try{localStorage.setItem('cacarejo.'+k,JSON.stringify(v))}catch{}}
+};
+
+const DURATION=60000;
+const MODES={
+ normal:{name:'Normal',tag:'clássico',desc:'A galinha pisca num lugar e some logo. Corpo vale 1 ovo, headshot vale 3.',size:[112,78],dwell:[1500,620],move:false,mult:.9,head:3},
+ strafe:{name:'Strafe',tag:'tracking',desc:'Ela corre de lado e muda de direção do nada, igual inimigo que sabe dar counter-strafe. Headshot vale 3.',size:[104,72],dwell:[2800,1500],move:true,speed:[150,420],mult:.8,head:3},
+ precisao:{name:'Precisão',tag:'tiro único',desc:'Galinha pequena, e cada tiro importa. Matou: 1 ponto. Em um tiro só: 5. Headshot: 2. Headshot em um tiro: 7. Fugiu: zero.',size:[92,60],dwell:[2000,1000],move:false,mult:.4,precision:true}
+};
+const TIERS=['Prata Pinto I','Prata Elite Penosa','Ouro Poedeira','Mestre Galináceo','Águia Cocoricó','Supremo Frangote','Global Elite Galinácea'];
+const HEN_NAMES=['Dona Cocota','Frangolino','Cocó Chanel','Galo Sem Noção','Penélope Pena','Gertrudes AWP','Galinácio','Tia Poedeira','Sargento Pipoca','Chico Frango','Rainha do Terreiro','Pintinho Pro'];
+const MISS_TAUNTS=['Errou!','Lag?','Ez.','Tá de olho fechado?','Mira de padaria','Cadê o skill?','Quase! (não)'];
+const ESC_TAUNTS=['Tchau!','Haha!','Muito lento!','Nem vi você','Cocó-ri-có!'];
+const HIT_CRIES=['CÓÓÓ!','AI, MEU OVO!','SOCÓRRO!','PÓ-CÓ!','FUI MORTA!','ME DEIXA!'];
+const TIPS=['No CS, mire na altura da cabeça antes de dobrar a esquina.','Respire. Mira tremida é mira que erra.','Sensibilidade menor costuma dar mais precisão no modo Precisão.','Aquecer 10 minutos antes do competitivo muda o jogo.','Clique só quando a mira parar. Spray e reza é outro modo.'];
+const STREAKS={3:'TRIO DE COXAS!',5:'ACE! GRANJA DIZIMADA',10:'ESQUADRÃO DE FRANGO',20:'GLOBAL ELITE GALINÁCEA!'};
+
+/* ---------- elements ---------- */
+const arena=$('arena'),field=$('field'),hen=$('hen'),xh=$('xh');
+let modeId=store.get('mode','normal');if(!MODES[modeId])modeId='normal';
+$('name').value=store.get('name','');
+
+/* ---------- sound ---------- */
+let ac=null,muted=store.get('muted',false);
+function A(){if(muted)return null;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch{}return ac}
+function tone(f0,f1,dur,type,vol,delay){const a=A();if(!a)return;const t=a.currentTime+(delay||0),o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+.03)}
+function noise(dur,freq,vol){const a=A();if(!a)return;const n=Math.floor(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,3);const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=freq;const g=a.createGain();g.gain.value=vol;s.connect(f);f.connect(g);g.connect(a.destination);s.start()}
+const sfx={
+ shot(){noise(.12,3200,.32);tone(170,50,.1,'sine',.28)},
+ cluck(){tone(720,380,.09,'square',.1);tone(540,300,.12,'square',.1,.1)},
+ head(){tone(1500,1500,.1,'sine',.16);tone(2300,2300,.2,'sine',.12,.06)},
+ miss(){tone(220,120,.1,'sawtooth',.05)},
+ beep(f){tone(f,f,.13,'square',.09)},
+ end(){tone(520,520,.12,'square',.1);tone(390,390,.12,'square',.1,.14);tone(260,260,.3,'square',.1,.28)}
+};
+function soundUI(){$('soundBtn').textContent=muted?'🔇 Mudo':'🔊 Som';$('soundBtn').setAttribute('aria-pressed',String(!muted))}
+$('soundBtn').onclick=()=>{muted=!muted;store.set('muted',muted);soundUI();if(!muted){A();sfx.cluck()}};
+soundUI();
+
+/* ---------- crosshair ---------- */
+const COLORS=['#8fe05a','#35e0ff','#ffe14a','#ff6bd6','#ffffff'];
+let xc=store.get('xcolor',COLORS[0]),xs=store.get('xsize',10),xg=store.get('xgap',5);
+function applyX(){
+ document.documentElement.style.setProperty('--xh',xc);document.documentElement.style.setProperty('--xl',xs+'px');document.documentElement.style.setProperty('--xs',xg+'px');
+ $('xsv').textContent=xs;$('xgv').textContent=xg;$('xsize').value=xs;$('xgap').value=xg;
+ for(const b of $('sw').children)b.setAttribute('aria-pressed',String(b.dataset.c===xc));
+}
+for(const c of COLORS){const b=document.createElement('button');b.style.background=c;b.dataset.c=c;b.setAttribute('aria-label','Cor '+c);b.onclick=()=>{xc=c;store.set('xcolor',c);applyX()};$('sw').append(b)}
+$('xsize').oninput=e=>{xs=+e.target.value;store.set('xsize',xs);applyX()};
+$('xgap').oninput=e=>{xg=+e.target.value;store.set('xgap',xg);applyX()};
+document.querySelectorAll('#xhPrev i,#xh i').forEach(()=>{});
+$('xhPrev').style.cssText='';
+applyX();
+arena.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const r=arena.getBoundingClientRect();xh.style.transform='translate('+(e.clientX-r.left)+'px,'+(e.clientY-r.top)+'px)'});
+arena.addEventListener('pointerleave',()=>xh.classList.remove('on'));
+arena.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')xh.classList.add('on')});
+xh.classList.remove('on');
+
+/* ---------- state ---------- */
+let lastResult=null,mode='idle',startT=0,last=0,spawnAt=0,expireAt=0,respawnAt=0,visible=false;
+let hx=0,hy=0,hw=0,hh=0,vx=0,flip=false,lastSec=-1,player='Você',henShots=0;
+let st=null;
+const prog=now=>clamp((now-startT)/DURATION,0,1);
+const fresh=()=>({perfect:0,score:0,shots:0,hits:0,heads:0,esc:0,streak:0,best:0,rts:[]});
+st=fresh();
+
+function hud(){
+ $('hScore').textContent=st.score;$('hHs').textContent=st.heads;$('hStreak').textContent=st.streak;
+ $('hAcc').textContent=st.shots?Math.round(st.hits/st.shots*100)+'%':'--';
+}
+function setTime(ms){
+ const s=Math.max(0,Math.ceil(ms/1000));if(s===lastSec)return;lastSec=s;
+ $('hTime').textContent='00:'+String(s).padStart(2,'0');$('chipT').classList.toggle('low',s<=10);
+}
+
+/* ---------- UI helpers ---------- */
+function floatTxt(txt,x,y,cls){const d=document.createElement('div');d.className='float '+(cls||'');d.textContent=txt;d.style.left=x+'px';d.style.top=y+'px';arena.append(d);setTimeout(()=>d.remove(),900)}
+function bubble(txt,x,y){const d=document.createElement('div');d.className='bubble';d.textContent=txt;arena.append(d);d.style.left=clamp(x,4,arena.clientWidth-d.offsetWidth-4)+'px';d.style.top=clamp(y,50,arena.clientHeight-30)+'px';setTimeout(()=>d.remove(),1000)}
+function banner(txt){const d=document.createElement('div');d.className='banner';d.textContent=txt;arena.append(d);setTimeout(()=>d.remove(),1650)}
+function kill(html,cls){const kf=$('kf'),d=document.createElement('div');d.className=cls||'';d.innerHTML=html;kf.append(d);while(kf.children.length>5)kf.firstChild.remove();setTimeout(()=>d.remove(),4500)}
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function shake(){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;arena.classList.remove('shake');void arena.offsetWidth;arena.classList.add('shake')}
+function eggFx(x,y,w,gold){
+ const s=clamp(w*.2,14,28),e=document.createElement('i');e.className='egg'+(gold?' gold':'');
+ e.style.cssText='width:'+s+'px;height:'+s*1.25+'px;left:'+x+'px;top:'+y+'px';field.append(e);
+ const dir=Math.random()<.5?-1:1,dx=dir*rnd(30,70),fall=Math.min(field.clientHeight-y-s*1.25-4,rnd(40,90));
+ e.animate([{transform:'translate(0,0) scale(.4)',opacity:0},{transform:'translate('+dx*.5+'px,'+(-30)+'px) rotate('+dir*40+'deg)',opacity:1,offset:.35},{transform:'translate('+dx+'px,'+Math.max(0,fall)+'px) rotate('+dir*90+'deg)',opacity:1,offset:.8},{transform:'translate('+dx+'px,'+Math.max(0,fall)+'px) rotate('+dir*90+'deg)',opacity:0}],{duration:1000,easing:'ease-out'}).onfinish=()=>e.remove();
+}
+function koFx(){
+ const c=hen.cloneNode(true);c.removeAttribute('id');c.hidden=false;c.style.pointerEvents='none';
+ c.querySelectorAll('[data-zone]').forEach(n=>n.style.pointerEvents='none');field.append(c);
+ const d=flip?-1:1;
+ c.animate([{transform:'scale(1)',opacity:1},{transform:'translateY(-14px) scale(1.12,.88)',opacity:1,offset:.22},{transform:'translate('+d*-24+'px,44px) rotate('+d*-45+'deg) scale(.75)',opacity:0}],{duration:560,easing:'ease-in'}).onfinish=()=>c.remove();
+}
+
+/* ---------- spawning ---------- */
+function spawn(now){
+ const m=MODES[modeId],p=prog(now),f=clamp(field.clientWidth/900,.6,1.35);
+ hw=Math.round(lerp(m.size[0],m.size[1],p)*f);hh=Math.round(hw*110/120);
+ const maxX=Math.max(0,field.clientWidth-hw),maxY=Math.max(0,field.clientHeight-hh),top=Math.min(64,maxY*.5);
+ const px=hx,py=hy;let tries=0;
+ do{hx=rnd(0,maxX);hy=rnd(top,maxY);tries++}while(tries<8&&Math.hypot(hx-px,hy-py)<Math.min(150,field.clientWidth*.25));
+ hx=Math.round(hx);hy=Math.round(hy);
+ vx=m.move?(Math.random()<.5?-1:1)*lerp(m.speed[0],m.speed[1],p)*f:0;
+ flip=m.move?vx<0:(hx<field.clientWidth/2?false:true);
+ if(!m.move&&Math.random()<.2)flip=!flip;
+ hen.className='hen'+(flip?' flip':'');
+ hen.style.width=hw+'px';hen.style.height=hh+'px';place();
+ hen.hidden=false;visible=true;henShots=0;spawnAt=now;expireAt=now+lerp(m.dwell[0],m.dwell[1],p);
+}
+function place(){hen.style.left=hx+'px';hen.style.top=hy+'px'}
+
+function escaped(now){
+ visible=false;hen.hidden=true;st.esc++;
+ if(st.streak>=3)kill('<em>'+esc(pick(HEN_NAMES))+'</em> fugiu e quebrou sua sequência','esc');
+ st.streak=0;hud();
+ bubble(pick(ESC_TAUNTS),hx+hw*.5,hy-8);
+ respawnAt=now+rnd(120,380);
+}
+
+/* ---------- loop ---------- */
+function loop(){
+ if(mode!=='play')return;
+ const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;
+ const el=now-startT;setTime(DURATION-el);
+ if(el>=DURATION){finish();return}
+ if(visible){
+  if(MODES[modeId].move){
+   hx+=vx*dt;const maxX=field.clientWidth-hw;
+   if(hx<0){hx=0;vx=Math.abs(vx)}else if(hx>maxX){hx=maxX;vx=-Math.abs(vx)}
+   if(Math.random()<dt*1.15)vx=-vx;
+   flip=vx<0;hen.classList.toggle('flip',flip);place();
+  }
+  if(now>=expireAt)escaped(now);
+ }else if(now>=respawnAt)spawn(now);
+ requestAnimationFrame(loop);
+}
+
+/* ---------- shooting ---------- */
+function onShot(e){
+ if(mode!=='play'||!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
+ e.preventDefault();
+ const r=arena.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,now=performance.now();
+ const zone=visible&&e.target.closest?e.target.closest('[data-zone]'):null;
+ st.shots++;if(visible)henShots++;sfx.shot();
+ if(zone)hit(zone.dataset.zone,now,px,py);else miss(px,py);
+ hud();
+}
+function hit(zone,now,px,py){
+ const head=zone==='head',m=MODES[modeId],first=henShots===1;
+ let pts,label;
+ if(m.precision){pts=head?(first?7:2):(first?5:1);label=(head?'HEADSHOT':'')+(first?(head?' ÚNICO':'TIRO ÚNICO'):(head?'':'')) ;if(first)st.perfect++}
+ else{pts=head?m.head:1;label=head?'HEADSHOT':''}
+ st.hits++;st.score+=pts;if(head)st.heads++;st.streak++;st.best=Math.max(st.best,st.streak);st.rts.push(now-spawnAt);
+ sfx.cluck();if(head){sfx.head();shake()}
+ floatTxt((label?label+' ':'')+'+'+pts,px,py-12,head||pts>=5?'hs':'');
+ bubble(pick(HIT_CRIES),hx+hw*(flip?0:.55),hy-6);
+ eggFx(hx+hw*(flip?.7:.25),hy+hh*.6,hw,head);
+ koFx();
+ kill('<span>'+esc(player)+'</span> 🔫 <em>'+esc(pick(HEN_NAMES))+'</em>'+(head?' ⌖ HEADSHOT':'')+(m.precision&&first?' ⚡ 1 TIRO':'')+' <em>+'+pts+'</em>',head||pts>=5?'hsk':'');
+ if(STREAKS[st.streak])banner(STREAKS[st.streak]);
+ visible=false;hen.hidden=true;respawnAt=now+rnd(80,200);
+}
+function miss(px,py){
+ st.streak=0;sfx.miss();
+ const h=document.createElement('i');h.className='hole';h.style.left=px+'px';h.style.top=py+'px';field.append(h);setTimeout(()=>h.remove(),3300);
+ if(visible&&Math.random()<.4)bubble(pick(MISS_TAUNTS),hx+hw*.5,hy-8);
+}
+field.addEventListener('pointerdown',onShot);
+field.addEventListener('contextmenu',e=>e.preventDefault());
+
+/* ---------- flow ---------- */
+function showIntro(){
+ mode='idle';arena.classList.remove('playing','count');
+ $('intro').hidden=false;$('result').hidden=true;$('countOv').hidden=true;hen.hidden=true;visible=false;
+ xh.classList.remove('on');
+}
+function buildModes(){
+ const box=$('modes');box.replaceChildren();
+ for(const id in MODES){const b=document.createElement('button');b.className='mode';b.dataset.m=id;b.innerHTML='<b>'+MODES[id].name+'</b><span>'+MODES[id].tag+'</span>';b.onclick=()=>setMode(id);box.append(b)}
+ const sel=$('rankMode');sel.replaceChildren();
+ for(const id in MODES){const o=document.createElement('option');o.value=id;o.textContent=MODES[id].name;sel.append(o)}
+}
+function setMode(id){
+ if(mode==='play'||mode==='count')return;modeId=id;store.set('mode',id);
+ for(const b of $('modes').children)b.setAttribute('aria-pressed',String(b.dataset.m===id));
+ $('modeDesc').textContent=MODES[id].desc;$('rankMode').value=id;ranking();
+}
+function startRound(){
+ const nm=$('name').value.trim().replace(/\s+/g,' ');player=nm||'Você';store.set('name',nm);
+ A();mode='count';st=fresh();hud();setTime(DURATION);lastSec=-1;setTime(DURATION);
+ $('kf').replaceChildren();$('intro').hidden=true;$('result').hidden=true;$('countOv').hidden=false;
+ arena.classList.add('count');arena.classList.remove('playing');
+ $('countTip').textContent=pick(TIPS);$('tip').innerHTML='<b>Dica:</b> '+esc(pick(TIPS));
+ $('status').textContent=MODES[modeId].name+' · '+player;
+ const seq=['3','2','1','JÁ!'];let i=0;
+ const step=()=>{
+  if(mode!=='count')return;
+  $('countNum').textContent=seq[i];sfx.beep(i===3?880:520);
+  if(i===3){setTimeout(go,420);return}
+  i++;setTimeout(step,640);
+ };
+ step();
+}
+function go(){
+ if(mode!=='count')return;
+ $('countOv').hidden=true;arena.classList.remove('count');arena.classList.add('playing');
+ mode='play';startT=last=performance.now();respawnAt=startT+150;visible=false;hx=hy=0;
+ xh.classList.add('on');requestAnimationFrame(loop);
+}
+function grade(){
+ const v=st.score*MODES[modeId].mult,steps=[0,14,28,42,56,70,84];let g=0;for(let i=0;i<steps.length;i++)if(v>=steps[i])g=i;return TIERS[g];
+}
+function quip(acc){
+ let q=acc<25?'Sua mira tá mais torta que pé de galinha.':acc<50?'Você atirou no vento, e o vento nem quis.':acc<70?'Dá pra jogar. No modo casual. Com amigos.':acc<85?'O vizinho pediu pra você parar de assustar o galinheiro.':'Mira de laser. A galinha pediu VAR.';
+ if(st.hits>5&&st.heads/st.hits>.5)q+=' E ainda é headshot machine!';
+ if(st.score===0)q='Zero ovos. A galinha saiu de fininho com a dignidade intacta.';
+ return q;
+}
+/* Tira da conta as reações fora da curva (Tukey: além de 1,5x a faixa interquartil), só com 8+ acertos. */
+function reactionStats(arr){
+ if(!arr.length)return null;
+ const a=[...arr].sort((x,y)=>x-y),q=p=>{const i=(a.length-1)*p,l=Math.floor(i);return a[l]+(a[Math.min(l+1,a.length-1)]-a[l])*(i-l)};
+ let kept=a;
+ if(a.length>=8){const q1=q(.25),q3=q(.75),iqr=q3-q1;kept=a.filter(v=>v>=q1-1.5*iqr&&v<=q3+1.5*iqr)}
+ return {avg:Math.round(kept.reduce((x,y)=>x+y,0)/kept.length),fast:Math.round(kept[0]),slow:Math.round(kept[kept.length-1]),dropped:a.length-kept.length,total:a.length};
+}
+function finish(){
+ if(mode!=='play')return;
+ mode='done';visible=false;hen.hidden=true;arena.classList.remove('playing');xh.classList.remove('on');setTime(0);sfx.end();
+ const acc=st.shots?Math.round(st.hits/st.shots*1000)/10:0,rs=reactionStats(st.rts),rt=rs?rs.avg:0;
+ const trays=Math.floor(st.score/30),rest=st.score%30;
+ $('rGrade').textContent=grade();$('rScore').textContent=st.score;
+ $('rTray').textContent=trays+(trays===1?' bandeja cheia':' bandejas cheias')+' + '+rest+(rest===1?' ovo avulso':' ovos avulsos');
+ $('rAcc').textContent=acc+'%';$('rHs').textContent=st.heads+' / '+st.hits;if(MODES[modeId].precision){$('rRtL').textContent='TIROS ÚNICOS';$('rRt').textContent=st.perfect+' / '+st.hits}else{$('rRtL').textContent='MELHOR SEQUÊNCIA';$('rRt').textContent=st.best}
+ const ms=v=>v+' ms';
+ $('rAvg').textContent=rs?ms(rs.avg):'--';$('rFast').textContent=rs?ms(rs.fast):'--';$('rSlow').textContent=rs?ms(rs.slow):'--';
+ $('rNote').textContent=!rs?'':rs.dropped?rs.dropped+(rs.dropped===1?' reação atípica foi descartada':' reações atípicas foram descartadas')+' (mão fora de posição, distração). Média sobre '+(rs.total-rs.dropped)+' acertos.':'Média sobre '+rs.total+' acertos.';$('rEsc').textContent=st.esc;
+ $('rQuip').textContent=quip(acc);
+ lastResult={v:1,nick:player,mode:modeId,ovos:st.score,shots:st.shots,hits:st.hits,heads:st.heads,esc:st.esc,acc,rt,perfect:st.perfect,best:st.best};
+ const rec=save(lastResult);
+ $('newrec').hidden=!rec;prepSubmit();
+ $('result').hidden=false;$('status').textContent='Fim de round · '+MODES[modeId].name;
+ $('rankMode').value=modeId;ranking();
+}
+$('play').onclick=startRound;$('again').onclick=startRound;$('menu').onclick=showIntro;
+$('name').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();startRound()}});
+$('helpBtn').onclick=()=>$('help').showModal();$('helpOk').onclick=()=>$('help').close();
+
+/* ---------- ranking: local + global (arquivo data/scores.json do repositório) ---------- */
+const MIN_HITS=15; /* precisão e reação só contam com 15+ acertos, senão 1 acerto em 1 tiro = 100% */
+function mergeScore(list,id,name,login,r){
+ let e=list.find(x=>x.id===id);if(!e){e={id,name,ovos:null,acc:null,rt:null};list.push(e)}
+ e.name=name;if(login)e.login=login;let rec=false;
+ if(r.ovos>0&&(!e.ovos||r.ovos>e.ovos.v)){e.ovos={v:r.ovos,h:r.hits};rec=true}
+ if(r.hits>=MIN_HITS){
+  if(!e.acc||r.acc>e.acc.v||(r.acc===e.acc.v&&r.hits>e.acc.h)){e.acc={v:r.acc,h:r.hits};rec=true}
+  if(r.rt&&(!e.rt||r.rt<e.rt.v)){e.rt={v:r.rt,h:r.hits};rec=true}
+ }
+ return rec;
+}
+function save(r){
+ const key='rank2.'+r.mode,list=store.get(key,[]);
+ const rec=mergeScore(list,r.nick.toLowerCase(),r.nick,'',r);store.set(key,list);return rec;
+}
+const CATS={
+ ovos:{th:'OVOS',fmt:v=>String(v),cmp:(a,b)=>b.ovos.v-a.ovos.v,hint:'Maior pontuação numa partida.'},
+ acc:{th:'PRECISÃO',fmt:v=>v.toFixed(1)+'%',cmp:(a,b)=>b.acc.v-a.acc.v||b.acc.h-a.acc.h,hint:'Acertos ÷ cliques. Só conta com '+MIN_HITS+'+ acertos na partida.'},
+ rt:{th:'REAÇÃO',fmt:v=>Math.round(v)+' ms',cmp:(a,b)=>a.rt.v-b.rt.v,hint:'Média sem as reações fora da curva. Só conta com '+MIN_HITS+'+ acertos na partida.'}
+};
+let rankCat='ovos',rankSrc='global',rv=0,gCache=null,gAt=0;
+const qs=new URLSearchParams(location.search);
+const REPO=(()=>{
+ const o=qs.get('repo');if(o&&/^[\w.-]+\/[\w.-]+$/.test(o)){const[a,b]=o.split('/');return{owner:a,repo:b,branch:'main'}}
+ const m=location.hostname.match(/^(.+)\.github\.io$/);
+ if(m)return{owner:m[1],repo:location.pathname.split('/')[1]||location.hostname,branch:'main'};
+ return null;
+})();
+async function loadGlobal(){
+ if(gCache&&Date.now()-gAt<45000)return gCache;
+ const urls=[];
+ if(REPO)urls.push('https://raw.githubusercontent.com/'+REPO.owner+'/'+REPO.repo+'/'+REPO.branch+'/data/scores.json');
+ urls.push('data/scores.json');
+ let err;
+ for(const u of urls){
+  try{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw Error(r.status);gCache=await r.json();gAt=Date.now();return gCache}catch(e){err=e}
+ }
+ throw err;
+}
+async function ranking(){
+ const ver=++rv,m=$('rankMode').value,c=CATS[rankCat];
+ $('thVal').textContent=c.th;$('rankHint').textContent=c.hint+(rankSrc==='local'?' Ranking salvo só neste navegador.':' Atualiza ~1 min após o envio.');
+ for(const b of $('rankCat').children)b.setAttribute('aria-pressed',String(b.dataset.c===rankCat));
+ for(const b of $('rankSrc').children)b.setAttribute('aria-pressed',String(b.dataset.s===rankSrc));
+ let data;
+ try{data=rankSrc==='local'?store.get('rank2.'+m,[]):((await loadGlobal()).modes||{})[m]||[]}
+ catch{if(ver!==rv)return;$('rows').replaceChildren();$('rankEmpty').hidden=false;$('rankEmpty').textContent='Ranking global indisponível agora. Abra o jogo pelo link do GitHub Pages.';return}
+ if(ver!==rv)return;
+ const rows=data.filter(e=>e[rankCat]).sort(c.cmp).slice(0,10),tb=$('rows');tb.replaceChildren();
+ rows.forEach((e,i)=>{
+  const tr=document.createElement('tr');if(player&&e.name.toLowerCase()===player.toLowerCase())tr.className='me';
+  const cells=[String(i+1).padStart(2,'0'),e.name,c.fmt(e[rankCat].v),e[rankCat].h];
+  cells.forEach((v,j)=>{const td=document.createElement('td');td.textContent=v;if(j===1&&e.login&&e.login.toLowerCase()!==e.name.toLowerCase()){const sm=document.createElement('small');sm.textContent=' @'+e.login;td.append(sm)}tr.append(td)});
+  tb.append(tr);
+ });
+ $('rankEmpty').hidden=rows.length>0;$('rankEmpty').textContent=rankSrc==='local'?'Você ainda não jogou neste modo aqui.':'Ninguém por aqui ainda. O primeiro lugar tá de graça.';
+}
+$('rankMode').onchange=ranking;
+for(const b of $('rankCat').children)b.onclick=()=>{rankCat=b.dataset.c;ranking()};
+for(const b of $('rankSrc').children)b.onclick=()=>{rankSrc=b.dataset.s;ranking()};
+
+/* envio: abre uma issue pré-preenchida; o bot do repositório confere e grava em data/scores.json */
+function prepSubmit(){
+ const ok=!!REPO&&lastResult&&lastResult.hits>0&&lastResult.ovos>0;
+ $('submit').hidden=!REPO;$('submit').disabled=!ok;
+ $('subNote').textContent=!REPO?'':ok?'Abre uma issue no GitHub (precisa de conta). O bot confere e atualiza o ranking em ~1 min.':'Acerte ao menos uma galinha para poder enviar.';
+}
+$('submit').onclick=()=>{
+ if(!REPO||!lastResult)return;
+ const body='Resultado do Cacarejo Aim Lab. Só clique em "Submit new issue", não edite.\n\n```json\n'+JSON.stringify(lastResult)+'\n```\n';
+ const title='[score] '+lastResult.nick+' · '+MODES[lastResult.mode].name+' · '+lastResult.ovos+' ovos';
+ const url='https://github.com/'+REPO.owner+'/'+REPO.repo+'/issues/new?title='+encodeURIComponent(title)+'&body='+encodeURIComponent(body);
+ window.open(url,'_blank','noopener');
+};
+
+buildModes();setMode(modeId);showIntro();
+$('tip').innerHTML='<b>Dica:</b> '+esc(pick(TIPS));
+</script>
+</body>
+</html>
